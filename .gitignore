@@ -1,1 +1,8 @@
 *.DS_Store
+tmp/
+config/initializers/spree.rb
+config/application.rb
+config/boot.rb
+config/database.yml
+config/environment.rb
+log/
