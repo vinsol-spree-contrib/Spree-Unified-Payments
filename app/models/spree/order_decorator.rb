@@ -1,5 +1,5 @@
 Spree::Order.class_eval do
-  has_many :unified_transactions, class_name => 'UnifiedPayment::Transaction'
+  has_many :unified_transactions, :class_name => 'UnifiedPayment::Transaction'
   def pending_card_transaction
     unified_transactions.pending.first
   end
