@@ -1,0 +1,3 @@
+<b>Transaction Failed.</b><br>
+<b>Reason : <%= @card_transaction.reload.response_description %></b><br>
+<%= link_to 'Back To Cart', '/cart', :target => "_parent", :class => 'button'  %>

@@ -1,0 +1,3 @@
+$('#payment-methods li:visible').hide();
+$('#checkout_form_payment').after("<%= j(render :template => 'spree/pay_by_cards/new') %>")
+$('#checkout_form_payment input:submit').hide();

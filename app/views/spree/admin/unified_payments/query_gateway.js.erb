@@ -1,0 +1,8 @@
+<% if @successfully_saved %>
+  alert('Successfully walleted');
+  $('#<%= @card_transaction.payment_transaction_id %> .action .wallet_link').hide();
+  $('#<%= @payment_transaction_id %> .gateway_order_status').text('<%= @order_status %>')
+<% else %>
+  alert('Could not wallet the money. Got order status <%= @order_status %>');
+  $('#<%= @payment_transaction_id %> .gateway_order_status').text('<%= @order_status %>')
+<% end %>

@@ -1,0 +1,30 @@
+<div class="unified_message">
+  Transaction Reference : <span><%= session[:transaction_id] %></span><br>
+  Please note this unique key as it would be needed for further payment reference.</div>
+  <table id="personal_details">
+    <tr>
+      <td align="left" valign="top" width="100"><strong>Email</strong></td>
+      <td align="left" valign="top"><%= @order.email %></td>
+    </tr>
+    <% if current_spree_user %>
+      <tr>
+        <td align="left" valign="top"><strong>Name</strong></td>
+        <td align="left" valign="top"><%= current_spree_user.full_name %></td>
+      </tr>
+      <tr>
+        <td align="left" valign="top"><strong>Phone</strong></td>
+        <td align="left" valign="top"><%= current_spree_user.phone %></td>
+      </tr>
+    <% end %>
+    <tr>
+      <td align="left" valign="top"><strong>Amount</strong></td>
+      <td align="left" valign="top"><%= @order.total %></td>
+    </tr>
+    <tr>
+      <td align="left" valign="top"><strong>Currency</strong></td>
+      <td align="left" valign="top"><%= Spree::Config[:currency] %></td>
+    </tr>
+  </table>
+<div class="rows pt20"><%= link_to 'Cancel', '/checkout/payment/', :id => 'back-to-payment', :method => 'get', :class => 'button' %> 
+  <%= button_to "Proceed To Payment", create_unified_transaction_path, :remote => true, :disable_with => "Please wait...", :id => 'confirm_payment' %>
+</div>

@@ -1,0 +1,126 @@
+<h1>Card Transactions</h1>
+
+<% content_for :table_filter do %>
+  <div data-hook="admin_orders_index_search">
+    <%= search_form_for [:admin, @search] do |f| %>
+      <div class="field-block alpha four columns">
+        <div class="date-range-filter field">
+          <%= label_tag nil, Spree.t(:date_range) %>
+          <div class="date-range-fields">
+            <%= f.text_field :created_at_gt, :class => 'datepicker datepicker-from', :value => params[:q][:created_at_gt], :placeholder => 'From' %>
+
+            <span class="range-divider">
+              <i class="icon-arrow-right"></i>
+            </span>
+
+            <%= f.text_field :created_at_lt, :class => 'datepicker datepicker-to', :value => params[:q][:created_at_lt], :placeholder => 'Till' %>
+          </div>
+        </div>
+
+        <div class="field">
+          <%= label_tag nil, Spree.t(:status) %>
+          <%= f.select :status_eq, ['pending', 'successful', 'unsuccessful'].each {|s| [s, s]}, {:include_blank => true}, :class => 'select2' %>
+        </div>
+      </div>
+
+      <div class="four columns">
+        <div class="field">
+          <%= label_tag nil, 'TransactionId' %>
+          <%= f.text_field :payment_transaction_id_eq %>
+        </div>
+      </div>
+
+      <div class="four columns">
+        <div class="field">
+          <%= label_tag nil, Spree.t(:first_name_begins_with) %>
+          <%= f.text_field :user_first_name_start, :size => 25 %>
+        </div>
+        <div class="field">
+          <%= label_tag nil, Spree.t(:last_name_begins_with) %>
+          <%= f.text_field :user_last_name_start, :size => 25%>
+        </div>
+      </div>
+
+      <div class="omega four columns">
+        <div class="field">
+          <%= label_tag nil, Spree.t(:phone) %>
+          <%= f.text_field :user_phone_eq %>
+        </div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="actions filter-actions">
+        <div data-hook="admin_orders_index_search_buttons">
+          <%= button Spree.t(:filter_results), 'icon-search' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @card_transactions.present? %>
+  <table class="order-summary" cellspacing="0" cellpadding="0" border="0">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Transaction Id</th>
+      <th>Order Status</td>
+      <th><%= Spree.t(:amount) %></th>
+      <th>PAN</th>
+      <th>Gateway Order Status</th>
+      <th>Response</th>
+      <th>transaction Status</th>
+      <th>Date</th>
+      <th>XmlResponse/<br>Receipt/<br>Query/Update<br>Wallet</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @card_transactions.each do |card_transaction| %>
+      <tr class="<%= cycle('even', 'odd') %>" id = "<%= card_transaction.payment_transaction_id %>" >
+        <% #using || for checkout guest users as there is no user for it%>
+        <td><%= card_transaction.user.try(:full_name) || card_transaction.order.email %></td>
+        <td><%= card_transaction.payment_transaction_id %></td>
+        <td><%= card_transaction.order.try(:state) %></td>
+        <td><%= number_to_currency(card_transaction.amount) %></td>
+        <td><%= card_transaction.pan %></td>
+        <td class="gateway_order_status"><%= card_transaction.gateway_order_status %></td>
+        <td>
+          <span class="card_transaction_label">ResponseCode: &darr;</span>
+          <%= card_transaction.response_status %>
+          <span class="card_transaction_label">Description: &darr;</span>
+          <%= card_transaction.response_description%>
+          <span class="card_transaction_label">AprrovalCode: &darr;</span>
+          <%= card_transaction.gateway_transaction.approval_code %>
+        </td>
+        <td><%= card_transaction.status %></td>
+        <td><%= card_transaction.created_at.strftime("%d %b %Y, %I:%M%p") %></td>
+        <td class="action">
+          <% unless card_transaction.status == 'pending' %>
+            <a href="javascript:void(0)" class="reveal_xml" data-ct-id=<%= card_transaction.id%>>View XML</a>
+            <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>|
+            <%= link_to "Receipt", "/admin/card_transactions/receipt/#{card_transaction.payment_transaction_id}"  %>
+            <% else %>
+            <%= link_to("QueryAndWallet", admin_card_transactions_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:full_name) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
+            <% end %>
+
+          </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= paginate @card_transactions %>
+<% else %>
+  No Transactions
+<% end %>
+<script>
+$(document).ready(function() {
+  $('.reveal_xml').click(function() {
+    ct_id = $(this).attr('data-ct-id');
+    var quick_view = new rnd.ModalPopUp($("<div></div>").attr('id', 'quick_view_popup').html($("#xml_response_" + ct_id).clone()));
+    $('#quick_view_popup .xml_response').removeClass('hidden');
+    quick_view.show();
+  })
+})
+
+</script>
