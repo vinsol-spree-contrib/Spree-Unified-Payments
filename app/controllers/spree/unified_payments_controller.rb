@@ -29,7 +29,7 @@ module Spree
         @payment_url = UnifiedPayment::Transaction.extract_url_for_unified_payment(response)
         tasks_after_order_create(response, session[:transaction_id])
       else
-        flash[:error] = "Could not create payment at unified, please pay by other methods or try again later." 
+        @error_message = "Could not create payment at unified, please pay by other methods or try again later." 
       end
       render js: "$('#confirm_payment').hide();top.location.href = '#{@payment_url}'" if @payment_url
     end
@@ -103,8 +103,7 @@ module Spree
 
     def load_order_on_redirect
       @gateway_message_hash = Hash.from_xml(params[:xmlmsg])['Message']
-      if @card_transaction = UnifiedPayment::Transaction.where(:gateway_order_id => @gateway_message_hash['OrderID']).first.try(:card_transaction)
-        # @gateway_transaction = @card_transaction.gateway_transaction
+      if @card_transaction = UnifiedPayment::Transaction.where(:gateway_order_id => @gateway_message_hash['OrderID']).first
         @order = @card_transaction.order
       else
         flash[:error] = 'No transaction. Please contact our support team.'
@@ -115,7 +114,7 @@ module Spree
     def tasks_after_order_create(response, transaction_id)
       response_order = response['Order']
       gateway_transaction = UnifiedPayment::Transaction.where(:gateway_session_id => response_order['SessionID'], :gateway_order_id => response_order['OrderID'], :url => response_order['URL']).first
-      gateway_transaction.assign_attributes(:user_id => order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => order.id, :gateway_order_status => 'CREATED', :amount => order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending')
+      gateway_transaction.assign_attributes(:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending')
       gateway_transaction.save!
 
       @order.reserve_stock

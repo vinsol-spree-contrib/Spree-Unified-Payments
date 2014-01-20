@@ -1,7 +1,7 @@
 module UnifiedTransactionHelper
-  # def naira_to_kobo(amount)
-  #   (amount.to_f)*100
-  # end
+  def naira_to_kobo(amount)
+    (amount.to_f)*100
+  end
 
   # def create_card_transaction(order, response, transaction_id)
   #   response_order = response['Order']

@@ -91,7 +91,7 @@
           <span class="card_transaction_label">Description: &darr;</span>
           <%= card_transaction.response_description%>
           <span class="card_transaction_label">AprrovalCode: &darr;</span>
-          <%= card_transaction.gateway_transaction.approval_code %>
+          <%= card_transaction.approval_code %>
         </td>
         <td><%= card_transaction.status %></td>
         <td><%= card_transaction.created_at.strftime("%d %b %Y, %I:%M%p") %></td>
@@ -99,9 +99,9 @@
           <% unless card_transaction.status == 'pending' %>
             <a href="javascript:void(0)" class="reveal_xml" data-ct-id=<%= card_transaction.id%>>View XML</a>
             <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>|
-            <%= link_to "Receipt", "/admin/card_transactions/receipt/#{card_transaction.payment_transaction_id}"  %>
+            <%= link_to "Receipt", "/admin/unified_payments/receipt/#{card_transaction.payment_transaction_id}"  %>
             <% else %>
-            <%= link_to("QueryAndWallet", admin_card_transactions_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:full_name) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
+            <%= link_to("QueryAndWallet", admin_unified_payments_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:full_name) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
             <% end %>
 
           </td>
