@@ -16,6 +16,10 @@ module Spree
     before_filter :load_order_on_redirect, :only => [:declined, :canceled, :approved]
     before_filter :ensure_session_transaction_id, :only => :create
 
+    def index
+      @card_transactions = spree_current_user.unified_payments.order('updated_at desc').page(params[:page]).per(20)
+    end
+
     def new
       session[:transaction_id] = generate_transaction_id
     end

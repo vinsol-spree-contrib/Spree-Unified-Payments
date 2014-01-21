@@ -1,0 +1,28 @@
+<h1>Unified Payment Transactions</h1>
+<% if @card_transactions.present? %>
+  <table class="order-summary" cellspacing="0" cellpadding="0" border="0">
+    <thead>
+    <tr>
+      <th>Transaction Status</th>
+      <th>Transaction Number</th>
+      <th><%= Spree.t(:amount) %></th>
+      <th>Response(Code:Description)</th>
+      <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @card_transactions.each do |card_transaction| %>
+      <tr class="<%= cycle('even', 'odd') %>">
+        <td><%= card_transaction.status.try(:capitalize) %></td>
+        <td><%= card_transaction.payment_transaction_id %></td>
+        <td><%= number_to_currency(card_transaction.amount) %></td>
+        <td>ApprovalCode:<%= card_transaction.approval_code %><br>ResponseCode:<%= card_transaction.response_status %><br>Description:<%= card_transaction.response_description%><br>Status:<%= card_transaction.gateway_order_status.capitalize %></td>
+        <td><%= card_transaction.created_at.strftime("%d %b %Y, %I:%M%p") %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= paginate @card_transactions %>
+<% else %>
+  No Transactions
+<% end %>
