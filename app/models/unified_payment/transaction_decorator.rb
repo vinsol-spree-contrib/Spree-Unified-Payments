@@ -58,8 +58,6 @@ UnifiedPayment::Transaction.class_eval do
     if xml_response.include?('<Message')
       info_hash = Hash.from_xml(xml_response)['Message']
       self.pan = info_hash['PAN']
-      self.amount = info_hash['PurchaseAmountScr']
-      self.currency = info_hash['Currency']
       self.response_description = info_hash['ResponseDescription']
       self.gateway_order_status = info_hash['OrderStatus']
       self.order_description = info_hash['OrderDescription']

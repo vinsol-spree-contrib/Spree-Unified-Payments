@@ -5,12 +5,9 @@ module Spree
   #
 
   class UnifiedPaymentsController < StoreController
-    # include UnifiedPayment::Utility
     include UnifiedTransactionHelper
-    # 
-    # before_filter :authenticate_spree_user!, :only => [:new, :create, :approved, :declined, :canceled]
-    before_filter :ensure_valid_order, :only => [:new, :create]
-    
+
+    before_filter :ensure_valid_order, :only => [:new, :create]    
     skip_before_filter :verify_authenticity_token, :only => [:approved, :declined, :canceled]
 
     before_filter :load_order_on_redirect, :only => [:declined, :canceled, :approved]
@@ -28,7 +25,7 @@ module Spree
       pending_card_transaction = @order.pending_card_transaction
       pending_card_transaction.try(:abort!)
 
-      response = UnifiedPayment::Transaction.create_order_at_unified(naira_to_kobo(@order.total), { :approve_url => "#{root_url}unified_payments/approved", :cancel_url => "#{root_url}unified_payments/canceled", :decline_url => "#{root_url}unified_payments/declined", :description => "Purchasing items from #{Spree::Config[:site_name]}" })
+      response = UnifiedPayment::Transaction.create_order_at_unified(@order.total, { :approve_url => "#{root_url}unified_payments/approved", :cancel_url => "#{root_url}unified_payments/canceled", :decline_url => "#{root_url}unified_payments/declined", :description => "Purchasing items from #{Spree::Config[:site_name]}" })
       if response
         @payment_url = UnifiedPayment::Transaction.extract_url_for_unified_payment(response)
         tasks_after_order_create(response, session[:transaction_id])

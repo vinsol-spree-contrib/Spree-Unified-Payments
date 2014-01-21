@@ -1,6 +1,4 @@
 Spree::CheckoutController.class_eval do
-  include CardTransactionHelper
-
   before_filter :redirect_for_card_payment, :only => :update, :if => :payment_state?
   
   private
