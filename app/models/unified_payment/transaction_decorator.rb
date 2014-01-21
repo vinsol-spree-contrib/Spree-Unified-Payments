@@ -1,6 +1,6 @@
 UnifiedPayment::Transaction.class_eval do    
   attr_accessible :payment_transaction_id, :order_id, :status, :user_id
-  validates :payment_transaction_id, :presence => true
+  # validates :payment_transaction_id, :presence => true
 
   belongs_to :order, :class_name => "Spree::Order"
   belongs_to :user, :class_name => "Spree::User"

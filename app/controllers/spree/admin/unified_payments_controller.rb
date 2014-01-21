@@ -19,7 +19,7 @@ module Spree
 
       def query_gateway
         @payment_transaction_id = params[:transaction_id]
-        @response = UnifiedPayment::Client.get_order_status(@gateway_transaction.gateway_order_id, @gateway_transaction.gateway_session_id)
+        @response = UnifiedPayment::Client.get_order_status(@card_transaction.gateway_order_id, @card_transaction.gateway_session_id)
         @order_status = @response["orderStatus"]
         update_transaction_on_query(@card_transaction, @order_status)
       end
@@ -28,7 +28,6 @@ module Spree
 
       def load_transactions
         @card_transaction = UnifiedPayment::Transaction.where(:payment_transaction_id => params[:transaction_id]).first
-        # @gateway_transaction = @card_transaction.gateway_transaction
       end
 
       def update_transaction_on_query(card_transaction, gateway_order_status)
