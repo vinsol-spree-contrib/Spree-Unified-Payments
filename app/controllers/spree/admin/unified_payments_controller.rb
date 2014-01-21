@@ -32,8 +32,8 @@ module Spree
 
       def update_transaction_on_query(card_transaction, gateway_order_status)
         update_hash = gateway_order_status == "APPROVED" ? {:status => 'successful'} : {}
-        @card_transaction.assign_attributes({:gateway_order_status => gateway_order_status}.merge(update_hash))
-        @card_transaction.save(:validate => false)
+        card_transaction.assign_attributes({:gateway_order_status => gateway_order_status}.merge(update_hash))
+        card_transaction.save(:validate => false)
       end
     end
   end

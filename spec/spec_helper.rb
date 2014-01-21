@@ -7,6 +7,8 @@ require 'rspec/rails'
 require 'rubygems'
 require 'bundler/setup'
 require 'spree_unified_payment'
+require 'database_cleaner'
+
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 # Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
@@ -31,7 +33,26 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   # config.use_transactional_fixtures = true
+  config.include Spree::Core::Engine.routes.url_helpers
+  config.before :suite do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
 
+  config.before type: :request do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before :each do
+    # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
+    DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+    DatabaseCleaner.start
+  end
+
+  # After each spec clean the database.
+  config.after :each do
+    DatabaseCleaner.clean
+  end
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of
   # rspec-rails.

@@ -92,7 +92,7 @@ module Spree
     def ensure_valid_order
       if @invalid_order_message = order_invalid_with_message
         flash[:error] = @invalid_order_message
-        render js: "top.location.href='#{root_url}cart'"
+        redirect_to '/cart'
       else 
         load_order
       end

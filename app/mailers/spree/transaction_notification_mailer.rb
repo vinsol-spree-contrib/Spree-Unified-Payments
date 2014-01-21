@@ -1,7 +1,7 @@
 module Spree
   class TransactionNotificationMailer < ActionMailer::Base
-    # include ApplicationHelper
-    helper 'application'
+    helper 'transaction_notification_mail'
+    # helper 'application'
     default :from => ADMIN_EMAIL
 
     def send_mail(card_transaction)
