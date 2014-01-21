@@ -6,3 +6,4 @@ config/boot.rb
 config/database.yml
 config/environment.rb
 log/
+Gemfile.lock
