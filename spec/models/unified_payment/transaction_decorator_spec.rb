@@ -422,24 +422,12 @@ describe UnifiedPayment::Transaction do
     context 'when user with the order email does not exist' do
       before do
         Spree::User.stub(:where).with(:email => order.email).and_return([]) 
-        @shipping_address = mock_model(Spree::Address, :firstname => 'test')
-        @shipping_address.stub(:firstname).and_return('test')
-        @shipping_address.stub(:lastname).and_return('user')
-        @shipping_address.stub(:phone).and_return('07123456789')
-        
-        order.stub(:shipping_address).and_return(@shipping_address)
-        @card_transaction.stub(:order).and_return(order)
-        Spree::User.any_instance.stub(:generate_random_password).and_return('ABC123')
-        Spree::User.stub(:create_unified_transaction_user).with(order.email, order.shipping_address.firstname, order.shipping_address.lastname, order.shipping_address.phone).and_return(user)
+        Spree::User.stub(:create_unified_transaction_user).with(order.email).and_return(user)
       end
 
       describe 'method calls' do
         it { Spree::User.should_receive(:where).with(:email => order.email).and_return([]) }
-        it { order.should_receive(:shipping_address).exactly(3).times.and_return(@shipping_address) }
-        it { @shipping_address.should_receive(:firstname).and_return(@shipping_address.firstname) }
-        it { @shipping_address.should_receive(:lastname).and_return(@shipping_address.lastname) }
-        it { @shipping_address.should_receive(:phone).and_return(@shipping_address.phone) }
-        it { Spree::User.should_receive(:create_unified_transaction_user).with(order.email, order.shipping_address.firstname, order.shipping_address.lastname, order.shipping_address.phone).and_return(user) }
+        it { Spree::User.should_receive(:create_unified_transaction_user).with(order.email).and_return(user) }
         
         after do
           @card_transaction.send(:associate_user)

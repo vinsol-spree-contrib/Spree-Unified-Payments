@@ -43,7 +43,7 @@ UnifiedPayment::Transaction.class_eval do
   def associate_user
     associate_with_user = Spree::User.where(:email => order.email).first
     if associate_with_user.nil?
-      associate_with_user = Spree::User.create_unified_transaction_user(order.email, order.shipping_address.firstname, order.shipping_address.lastname, order.shipping_address.phone)
+      associate_with_user = Spree::User.create_unified_transaction_user(order.email)
     end
     self.user = associate_with_user
     save!
