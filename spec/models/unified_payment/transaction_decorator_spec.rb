@@ -430,6 +430,7 @@ describe UnifiedPayment::Transaction do
         order.stub(:shipping_address).and_return(@shipping_address)
         @card_transaction.stub(:order).and_return(order)
         Spree::User.any_instance.stub(:generate_random_password).and_return('ABC123')
+        Spree::User.stub(:create_unified_transaction_user).with(order.email, order.shipping_address.firstname, order.shipping_address.lastname, order.shipping_address.phone).and_return(user)
       end
 
       describe 'method calls' do
@@ -438,22 +439,17 @@ describe UnifiedPayment::Transaction do
         it { @shipping_address.should_receive(:firstname).and_return(@shipping_address.firstname) }
         it { @shipping_address.should_receive(:lastname).and_return(@shipping_address.lastname) }
         it { @shipping_address.should_receive(:phone).and_return(@shipping_address.phone) }
+        it { Spree::User.should_receive(:create_unified_transaction_user).with(order.email, order.shipping_address.firstname, order.shipping_address.lastname, order.shipping_address.phone).and_return(user) }
         
         after do
           @card_transaction.send(:associate_user)
         end
       end
 
-      describe 'creates a new user' do
-        before do
-          @card_transaction.send(:associate_user)
-          @user = @card_transaction.user
-        end
-
-        it { @user.first_name.should eq('test') }
-        it { @user.last_name.should eq('user') }
-        it { @user.phone.should eq('07123456789') }
-        it { @user.email.should eq(order.email) }
+      it 'associates a new user' do
+        @card_transaction.user.should be_nil
+        @card_transaction.send(:associate_user)
+        @card_transaction.user.should eq(user)
       end
     end
   end
