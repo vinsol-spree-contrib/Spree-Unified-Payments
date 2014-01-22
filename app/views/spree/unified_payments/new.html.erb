@@ -7,14 +7,18 @@
       <td align="left" valign="top"><%= @order.email %></td>
     </tr>
     <% if current_spree_user %>
+      <% if current_spree_user.respond_to?(:full_name) %>
       <tr>
         <td align="left" valign="top"><strong>Name</strong></td>
         <td align="left" valign="top"><%= current_spree_user.full_name %></td>
       </tr>
+      <% end %>
+      <% if current_spree_user.respond_to?(:phone) %>
       <tr>
         <td align="left" valign="top"><strong>Phone</strong></td>
         <td align="left" valign="top"><%= current_spree_user.phone %></td>
       </tr>
+      <% end %>
     <% end %>
     <tr>
       <td align="left" valign="top"><strong>Amount</strong></td>

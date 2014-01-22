@@ -2,7 +2,7 @@ module SpreeUnifiedGateway
   class Engine < Rails::Engine
     require 'spree/core'
     isolate_namespace Spree
-    engine_name 'spree_unified_gateway'
+    engine_name 'spree_unified_payment'
 
     config.autoload_paths += %W(#{config.root}/lib)
 
