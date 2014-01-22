@@ -1,7 +1,7 @@
 module Spree
   module Admin
     class UnifiedPaymentsController < Spree::Admin::BaseController
-      before_filter :load_transactions, :only => :query_gateway
+      before_filter :load_transactions, :only => [:query_gateway, :receipt]
 
       def index
         params[:q] ||= {}
@@ -10,7 +10,6 @@ module Spree
       end
 
       def receipt
-        @card_transaction = UnifiedPayment::Transaction.where(:payment_transaction_id => params[:number]).first
         @order = @card_transaction.order
         doc = Nokogiri::XML(@card_transaction.xml_response)
         @message = Hash.from_xml(doc.to_xml)['Message']

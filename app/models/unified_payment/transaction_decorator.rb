@@ -9,7 +9,7 @@ UnifiedPayment::Transaction.class_eval do
   after_create :enqueue_expiration_task
 
   after_save :notify_user, :if => [:status_changed?, "status_was == 'pending'"]
-  before_save :update_using_xml, :if => [:status_changed?, "status != 'pending'"]
+  before_save :assign_attributes_using_xml, :if => [:status_changed?, "status != 'pending'"]
   after_save :complete_order, :if => [:status_changed?, :payment_valid_for_order?, "status == 'successful' && !order_inventory_released?"]
   after_save :wallet_transaction, :if => [:status_changed? ,"(!payment_valid_for_order? || order_inventory_released?) && status == 'successful'"]
   after_save :cancel_order, :if => [:status_changed?, "status == 'unsuccessful'"]
@@ -43,27 +43,18 @@ UnifiedPayment::Transaction.class_eval do
   def associate_user
     associate_with_user = Spree::User.where(:email => order.email).first
     if associate_with_user.nil?
-      associate_with_user = build_user(:email => order.email, 
-                                       :first_name => order.shipping_address.firstname, 
-                                       :last_name => order.shipping_address.lastname, 
-                                       :phone => order.shipping_address.phone)
-      associate_with_user.password = associate_with_user.generate_random_password
-      associate_with_user.save!
+      associate_with_user = Spree::User.create_unified_transaction_user(order.email, order.shipping_address.firstname, order.shipping_address.lastname, order.shipping_address.phone)
     end
     self.user = associate_with_user
     save!
   end
 
-  def update_using_xml
+  def assign_attributes_using_xml
     if xml_response.include?('<Message')
       info_hash = Hash.from_xml(xml_response)['Message']
-      self.pan = info_hash['PAN']
-      self.response_description = info_hash['ResponseDescription']
-      self.gateway_order_status = info_hash['OrderStatus']
-      self.order_description = info_hash['OrderDescription']
-      self.response_status = info_hash['Status']
-      self.merchant_id = info_hash['MerchantTranID']
-      self.approval_code = info_hash['ApprovalCode']
+      {:pan= => 'PAN', :response_description= => 'ResponseDescription', :gateway_order_status= => 'OrderStatus', :order_description= => 'OrderDescription', :response_status= => 'Status', :merchant_id= => 'MerchantTranID', :approval_code= => 'ApprovalCode'}.each_pair do |attribute, xml_mapping|
+        self.send(attribute, info_hash[xml_mapping])
+      end
     end
   end
 

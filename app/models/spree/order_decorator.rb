@@ -27,7 +27,6 @@ Spree::Order.class_eval do
     if total == 0 then 'Order Total is invalid'
     elsif completed? then 'Order already completed'
     elsif insufficient_stock_lines.present? then 'An item in your cart has become unavailable.'
-    elsif inactive_variants.present? then "#{inactive_variants.map(&:name).join(', ')} not available at our store any more."
     end
   end
 

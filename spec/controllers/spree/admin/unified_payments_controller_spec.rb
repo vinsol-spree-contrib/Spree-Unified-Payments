@@ -62,18 +62,18 @@ describe Spree::Admin::UnifiedPaymentsController do
       it { card_transaction.should_receive(:order).and_return(order)}
 
       after do
-        send_request(:number => '123456')
+        send_request(:transaction_id => '123456')
       end
     end
 
     it 'should render no layout' do
-      send_request(:number => '123456')  
+      send_request(:transaction_id => '123456')  
       response.should render_template(:layout => false)
     end
 
     describe 'assigns' do
       before do
-        send_request(:number => '123456')
+        send_request(:transaction_id => '123456')
       end
       
       it { assigns(:message).should eq('123') }

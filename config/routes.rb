@@ -9,7 +9,7 @@ Spree::Core::Engine.routes.prepend do
 
   namespace :admin do
     get '/unified_payments', :to => "unified_payments#index"
-    get '/unified_payments/receipt/:number', :to => "unified_payments#receipt", :as => :unified_payments_receipt
+    get '/unified_payments/receipt/:transaction_id', :to => "unified_payments#receipt", :as => :unified_payments_receipt
     post '/unified_payments/query_gateway', :to => "unified_payments#query_gateway", :as => :unified_payments_query_gateway
   end
 end

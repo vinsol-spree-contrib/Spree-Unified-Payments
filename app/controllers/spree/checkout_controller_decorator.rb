@@ -14,6 +14,5 @@ Spree::CheckoutController.class_eval do
       @order.update_attributes(object_params)
       redirect_to new_unified_transaction_path
     end
-    true
   end
 end

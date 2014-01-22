@@ -14,7 +14,7 @@ describe UnifiedPayment::Transaction do
   let(:user) { mock_model(Spree::User) }
 
   before do
-    UnifiedPayment::Transaction.any_instance.stub(:update_using_xml).and_return(true)
+    UnifiedPayment::Transaction.any_instance.stub(:assign_attributes_using_xml).and_return(true)
     UnifiedPayment::Transaction.any_instance.stub(:notify_user).and_return(true)
     UnifiedPayment::Transaction.any_instance.stub(:complete_order).and_return(true)
     UnifiedPayment::Transaction.any_instance.stub(:cancel_order).and_return(true)
@@ -32,7 +32,7 @@ describe UnifiedPayment::Transaction do
         end
 
         it { @pending_card_transaction.should_not_receive(:notify_user) }
-        it { @pending_card_transaction.should_not_receive(:update_using_xml) }
+        it { @pending_card_transaction.should_not_receive(:assign_attributes_using_xml) }
         it { @pending_card_transaction.should_not_receive(:complete_order) }
         it { @pending_card_transaction.should_not_receive(:cancel_order) }
         it { @pending_card_transaction.should_not_receive(:wallet_transaction) }
@@ -51,7 +51,7 @@ describe UnifiedPayment::Transaction do
         end
 
         it { @successful_card_transaction.should_receive(:notify_user).and_return(true) }
-        it { @successful_card_transaction.should_receive(:update_using_xml).and_return(true) }
+        it { @successful_card_transaction.should_receive(:assign_attributes_using_xml).and_return(true) }
         it { @successful_card_transaction.should_not_receive(:release_order_inventory) }
 
         context 'order inventory released' do
@@ -108,7 +108,7 @@ describe UnifiedPayment::Transaction do
         end
 
         it { @unsuccessful_card_transaction.should_receive(:notify_user).and_return(true) }
-        it { @unsuccessful_card_transaction.should_receive(:update_using_xml).and_return(true) }
+        it { @unsuccessful_card_transaction.should_receive(:assign_attributes_using_xml).and_return(true) }
         it { @unsuccessful_card_transaction.should_not_receive(:complete_order) }
         it { @unsuccessful_card_transaction.should_receive(:cancel_order).and_return(true) }
         it { @unsuccessful_card_transaction.should_not_receive(:release_order_inventory) }
@@ -166,9 +166,9 @@ describe UnifiedPayment::Transaction do
     it { @pending_card_transaction.order_inventory_released?.should be_false }
   end
 
-  describe '#update_using_xml' do
+  describe '#assign_attributes_using_xml' do
     before do
-      UnifiedPayment::Transaction.any_instance.unstub(:update_using_xml)
+      UnifiedPayment::Transaction.any_instance.unstub(:assign_attributes_using_xml)
       @card_transaction_with_message = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123321')
       @xml_response = '<Message><PAN>123XXX123</PAN><PurchaseAmountScr>200</PurchaseAmountScr><Currency>NGN</Currency><ResponseDescription>TestDescription</ResponseDescription><OrderStatus>OnTest</OrderStatus><OrderDescription>TestOrder</OrderDescription><Status>00</Status><MerchantTranID>12345654321</MerchantTranID><ApprovalCode>123ABC</ApprovalCode></Message>'
       @card_transaction_with_message.stub(:xml_response).and_return(@xml_response)
@@ -182,12 +182,12 @@ describe UnifiedPayment::Transaction do
       it { @xml_response.should_receive(:include?).with('<Message').and_return(true) } 
         
       after do
-        @card_transaction_with_message.send(:update_using_xml)
+        @card_transaction_with_message.send(:assign_attributes_using_xml)
       end
     end
 
     describe 'assigns' do
-      before { @card_transaction_with_message.send(:update_using_xml) }
+      before { @card_transaction_with_message.send(:assign_attributes_using_xml) }
       it { @card_transaction_with_message.pan.should eq('123XXX123') }
       it { @card_transaction_with_message.response_description.should eq('TestDescription') }
       it { @card_transaction_with_message.gateway_order_status.should eq('OnTest') }
