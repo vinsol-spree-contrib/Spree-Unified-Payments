@@ -352,16 +352,29 @@ describe UnifiedPayment::Transaction do
       @last_id = UnifiedPayment::Transaction.last.try(:id) || 0
       current_time = Time.current
       Time.stub(:current).and_return(current_time)
-      @new_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
+      @new_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending')
       @new_card_transaction.stub(:id).and_return(123)
     end
+    
+    context 'when transaction id is present' do
+      before { @new_card_transaction.payment_transaction_id = '1234' }
+      it 'enqueue delayed job' do
+        Delayed::Job.should_receive(:enqueue).with(TransactionExpiration.new(@new_card_transaction.id), { :run_at => TRANSACTION_LIFETIME.minutes.from_now }).and_return(true)
+      end
 
-    it 'enqueue delayed job' do
-      Delayed::Job.should_receive(:enqueue).with(TransactionExpiration.new(@new_card_transaction.id), { :run_at => TRANSACTION_LIFETIME.minutes.from_now }).and_return(true)
+      after do
+        @new_card_transaction.save!
+      end
     end
 
-    after do
-      @new_card_transaction.save!
+    context 'when transaction id is not present' do
+      it 'does not enqueue delayed job' do
+        Delayed::Job.should_not_receive(:enqueue).with(TransactionExpiration.new(@new_card_transaction.id), { :run_at => TRANSACTION_LIFETIME.minutes.from_now })
+      end
+
+      after do
+        @new_card_transaction.save!
+      end
     end
   end
 
