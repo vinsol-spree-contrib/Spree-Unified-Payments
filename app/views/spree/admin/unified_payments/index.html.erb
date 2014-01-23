@@ -61,7 +61,7 @@
     <% @card_transactions.each do |card_transaction| %>
       <tr class="<%= cycle('even', 'odd') %>" id = "<%= card_transaction.payment_transaction_id %>" >
         <% #using || for checkout guest users as there is no user for it%>
-        <td><%= card_transaction.user.try(:full_name) || card_transaction.order.email %></td>
+        <td><%= card_transaction.user.try(:email) || card_transaction.order.email %></td>
         <td><%= card_transaction.payment_transaction_id %></td>
         <td><%= card_transaction.order.try(:state) %></td>
         <td><%= number_to_currency(card_transaction.amount) %></td>
@@ -79,11 +79,11 @@
         <td><%= card_transaction.created_at.strftime("%d %b %Y, %I:%M%p") %></td>
         <td class="action">
           <% unless card_transaction.status == 'pending' %>
-            <a href="javascript:void(0)" class="reveal_xml" data-ct-id=<%= card_transaction.id%>>View XML</a>
+            <a href="javascript:void(0)" id="reveal_xml" data-ct-id=<%= card_transaction.id%>>View XML</a>
             <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>|
             <%= link_to "Receipt", "/admin/unified_payments/receipt/#{card_transaction.payment_transaction_id}"  %>
             <% else %>
-            <%= link_to("QueryAndWallet", admin_unified_payments_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:full_name) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
+            <%= link_to("QueryAndWallet", admin_unified_payments_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:email) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
             <% end %>
 
           </td>
@@ -95,14 +95,3 @@
 <% else %>
   No Transactions
 <% end %>
-<script>
-$(document).ready(function() {
-  $('.reveal_xml').click(function() {
-    ct_id = $(this).attr('data-ct-id');
-    var quick_view = new rnd.ModalPopUp($("<div></div>").attr('id', 'quick_view_popup').html($("#xml_response_" + ct_id).clone()));
-    $('#quick_view_popup .xml_response').removeClass('hidden');
-    quick_view.show();
-  })
-})
-
-</script>

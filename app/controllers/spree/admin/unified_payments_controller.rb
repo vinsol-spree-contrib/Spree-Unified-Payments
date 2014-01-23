@@ -1,6 +1,8 @@
 module Spree
   module Admin
     class UnifiedPaymentsController < Spree::Admin::BaseController
+      helper 'transaction_notification_mail'
+      
       before_filter :load_transactions, :only => [:query_gateway, :receipt]
 
       def index

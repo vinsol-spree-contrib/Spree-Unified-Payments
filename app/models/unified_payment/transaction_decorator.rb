@@ -6,7 +6,7 @@ UnifiedPayment::Transaction.class_eval do
   belongs_to :user, :class_name => "Spree::User"
   has_one :store_credit, :class_name => "Spree::StoreCredit"
   scope :pending, lambda { where :status => 'pending' }
-  after_create :enqueue_expiration_task
+  after_create :enqueue_expiration_task, :if => [:payment_transaction_id?]
 
   after_save :notify_user, :if => [:status_changed?, "status_was == 'pending'"]
   before_save :assign_attributes_using_xml, :if => [:status_changed?, "status != 'pending'"]
