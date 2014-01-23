@@ -80,12 +80,13 @@
         <td class="action">
           <% unless card_transaction.status == 'pending' %>
             <a href="javascript:void(0)" id="reveal_xml" data-ct-id=<%= card_transaction.id%>>View XML</a>
-            <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>|
-            <%= link_to "Receipt", "/admin/unified_payments/receipt/#{card_transaction.payment_transaction_id}"  %>
-            <% else %>
-            <%= link_to("QueryAndWallet", admin_unified_payments_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:email) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
+            <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>
+            <% unless card_transaction.store_credit.present? %>
+              |<%= link_to "Receipt", "/admin/unified_payments/receipt/#{card_transaction.payment_transaction_id}" %>
             <% end %>
-
+          <% else %>
+            <%= link_to("QueryAndWallet", admin_unified_payments_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:email) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>
+          <% end %>
           </td>
       </tr>
     <% end %>
