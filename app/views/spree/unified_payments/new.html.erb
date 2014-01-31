@@ -29,6 +29,7 @@
       <td align="left" valign="top"><%= Spree::Config[:currency] %></td>
     </tr>
   </table>
+  <!-- [TODO_CR] Not sure why we haven't used rails route method here -->
 <div class="rows pt20"><%= link_to 'Cancel', '/checkout/payment/', :id => 'back-to-payment', :method => 'get', :class => 'button' %> 
   <%= button_to "Proceed To Payment", create_unified_transaction_path, :remote => true, :disable_with => "Please wait...", :id => 'confirm_payment' %>
 </div>

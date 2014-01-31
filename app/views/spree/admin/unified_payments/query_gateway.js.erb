@@ -1,3 +1,6 @@
+// [TODO_CR] Instead of @order_status. We should check unified_payments_transaction status here
+// unified_payments_transaction.successful?
+// Are we crediting user in wallet all the time?
 <% if @order_status == "APPROVED" %>
   alert('Successfully walleted');
   $('#<%= @card_transaction.payment_transaction_id %> .action .wallet_link').hide();

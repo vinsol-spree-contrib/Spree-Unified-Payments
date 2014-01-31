@@ -4,6 +4,7 @@ Spree::Order.class_eval do
     unified_transactions.pending.first
   end
 
+  #[TODO] Are we using this outside too? If not this should be private
   def release_inventory
     shipments.each do |shipment|
       shipment.cancel if shipment.inventory_units.any? { |iu| iu.pending == false }
@@ -24,6 +25,7 @@ Spree::Order.class_eval do
   end
 
   def reason_if_cant_pay_by_card
+    #[TODO] total == 0 can be written as total.zero?
     if total == 0 then 'Order Total is invalid'
     elsif completed? then 'Order already completed'
     elsif insufficient_stock_lines.present? then 'An item in your cart has become unavailable.'

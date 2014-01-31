@@ -3,6 +3,14 @@ module UnifiedTransactionHelper
     (amount.to_f)*100
   end
 
+  # [TODO_CR] transaction generation seems a complicated what if we do somthing like below mentioned
+  #
+  # payment_transaction_id=''
+  # begin
+  #   payment_transaction_id = generate_id_using_timestamp
+  # end while UnifiedPayment::Transaction.exists?(payment_transaction_id: payment_transaction_id)
+  # payment_transaction_id
+
   def generate_transaction_id
     (1..3).each do |attempt|
       @transaction_id = generate_id_using_timestamp + attempt.to_s

@@ -1,9 +1,13 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name = "spree_unified_payment"
+
+  #[TODO_CR] Lets name this version 1.0.0
   s.version = "2.0.3"
   s.author = "Manish Kangia"
 
+  #[TODO_CR] We need to update this date each time we ar emaking new build.
+  # Else we can leave this blank
   s.date = "2014-01-21"
   s.email     = 'info@vinsol.com'
   s.homepage  = 'http://vinsol.com' 

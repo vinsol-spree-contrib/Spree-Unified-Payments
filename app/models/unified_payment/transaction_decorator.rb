@@ -8,6 +8,7 @@ UnifiedPayment::Transaction.class_eval do
   scope :pending, lambda { where :status => 'pending' }
   after_create :enqueue_expiration_task, :if => [:payment_transaction_id?]
 
+  #[TODO_CR] we should move conditions written below for all callbacks into methods.
   after_save :notify_user, :if => [:status_changed?, "status_was == 'pending'"]
   before_save :assign_attributes_using_xml, :if => [:status_changed?, "status != 'pending'"]
   after_save :complete_order, :if => [:status_changed?, :payment_valid_for_order?, "status == 'successful' && !order_inventory_released?"]
@@ -24,6 +25,7 @@ UnifiedPayment::Transaction.class_eval do
   end
 
   def abort!
+    #[TODO_CR] Use Time.current
     update_attribute(:expired_at, Time.now)
   end
 
@@ -34,6 +36,8 @@ UnifiedPayment::Transaction.class_eval do
   def wallet_transaction(transactioner = nil)
     associate_user if user.nil?
     store_credit_balance = user.store_credits_total + amount.to_f
+
+    #[TODO_CR] not sure why payment mode is -1
     store_credit = build_store_credit(:balance => store_credit_balance, :user => user, :transactioner => (transactioner || user), :amount => amount.to_f, :reason => "transferred from transaction:#{payment_transaction_id}", :payment_mode => -1, :type => "Spree::Credit")
     store_credit.save!
   end
@@ -42,6 +46,7 @@ UnifiedPayment::Transaction.class_eval do
 
   def associate_user
     associate_with_user = Spree::User.where(:email => order.email).first
+    #[TODO_CR] do we really need .nil? here
     if associate_with_user.nil?
       associate_with_user = Spree::User.create_unified_transaction_user(order.email)
     end
@@ -52,12 +57,17 @@ UnifiedPayment::Transaction.class_eval do
   def assign_attributes_using_xml
     if xml_response.include?('<Message')
       info_hash = Hash.from_xml(xml_response)['Message']
+
+      UNIFIED_XML_CONTENT_MAPPING
       {:pan= => 'PAN', :response_description= => 'ResponseDescription', :gateway_order_status= => 'OrderStatus', :order_description= => 'OrderDescription', :response_status= => 'Status', :merchant_id= => 'MerchantTranID', :approval_code= => 'ApprovalCode'}.each_pair do |attribute, xml_mapping|
         self.send(attribute, info_hash[xml_mapping])
       end
     end
   end
 
+  #[TODO_CR] The delivery should be asyncronous (via delayed_job) 
+  # I thing delayed job is already a depency for this
+  # name should be somthing like deliver_transaction_status_email/notify_user_on_transaction_status
   def notify_user
     Spree::TransactionNotificationMailer.send_mail(self).deliver!
   end
