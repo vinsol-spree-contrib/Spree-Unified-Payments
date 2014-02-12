@@ -15,7 +15,7 @@ describe UnifiedPayment::Transaction do
 
   before do
     UnifiedPayment::Transaction.any_instance.stub(:assign_attributes_using_xml).and_return(true)
-    UnifiedPayment::Transaction.any_instance.stub(:notify_user).and_return(true)
+    UnifiedPayment::Transaction.any_instance.stub(:notify_user_on_transaction_status).and_return(true)
     UnifiedPayment::Transaction.any_instance.stub(:complete_order).and_return(true)
     UnifiedPayment::Transaction.any_instance.stub(:cancel_order).and_return(true)
     UnifiedPayment::Transaction.any_instance.stub(:wallet_transaction).and_return(true)
@@ -31,7 +31,7 @@ describe UnifiedPayment::Transaction do
           @pending_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
         end
 
-        it { @pending_card_transaction.should_not_receive(:notify_user) }
+        it { @pending_card_transaction.should_not_receive(:notify_user_on_transaction_status) }
         it { @pending_card_transaction.should_not_receive(:assign_attributes_using_xml) }
         it { @pending_card_transaction.should_not_receive(:complete_order) }
         it { @pending_card_transaction.should_not_receive(:cancel_order) }
@@ -50,7 +50,7 @@ describe UnifiedPayment::Transaction do
           @successful_card_transaction.status = 'successful'
         end
 
-        it { @successful_card_transaction.should_receive(:notify_user).and_return(true) }
+        it { @successful_card_transaction.should_receive(:notify_user_on_transaction_status).and_return(true) }
         it { @successful_card_transaction.should_receive(:assign_attributes_using_xml).and_return(true) }
         it { @successful_card_transaction.should_not_receive(:release_order_inventory) }
 
@@ -107,7 +107,7 @@ describe UnifiedPayment::Transaction do
           it { @unsuccessful_card_transaction.should_not_receive(:complete_order) }
         end
 
-        it { @unsuccessful_card_transaction.should_receive(:notify_user).and_return(true) }
+        it { @unsuccessful_card_transaction.should_receive(:notify_user_on_transaction_status).and_return(true) }
         it { @unsuccessful_card_transaction.should_receive(:assign_attributes_using_xml).and_return(true) }
         it { @unsuccessful_card_transaction.should_not_receive(:complete_order) }
         it { @unsuccessful_card_transaction.should_receive(:cancel_order).and_return(true) }
@@ -198,12 +198,13 @@ describe UnifiedPayment::Transaction do
     end
   end
 
-  describe '#notify_user' do
+  describe '#notify_user_on_transaction_status' do
     before do
-      UnifiedPayment::Transaction.any_instance.unstub(:notify_user)
+      UnifiedPayment::Transaction.any_instance.unstub(:notify_user_on_transaction_status)
       @card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
       @mailer_object = Object.new
       @mailer_object.stub(:deliver!).and_return(true)
+      Spree::TransactionNotificationMailer.stub(:delay).and_return(Spree::TransactionNotificationMailer)
       Spree::TransactionNotificationMailer.stub(:send_mail).with(@card_transaction).and_return(@mailer_object)
     end
 
@@ -217,8 +218,8 @@ describe UnifiedPayment::Transaction do
         @card_transaction.status = 'successful'
       end
 
+      it { Spree::TransactionNotificationMailer.should_receive(:delay).and_return(Spree::TransactionNotificationMailer) }
       it { Spree::TransactionNotificationMailer.should_receive(:send_mail).with(@card_transaction).and_return(@mailer_object) }
-      it { @mailer_object.should_receive(:deliver!).and_return(true) }
     end
     
     after do
@@ -424,7 +425,6 @@ describe UnifiedPayment::Transaction do
       
       describe 'method calls' do
         it { Spree::User.should_receive(:where).with(:email => order.email).and_return([user]) }
-        it { user.should_receive(:nil?).and_return(false) }
         it { @card_transaction.should_receive(:user=).with(user).and_return(true) }
         after do
           @card_transaction.send(:associate_user)

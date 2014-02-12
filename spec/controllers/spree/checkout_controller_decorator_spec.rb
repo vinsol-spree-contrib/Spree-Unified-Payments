@@ -50,6 +50,7 @@ describe Spree::CheckoutController do
     context 'if payment state' do
       before do
         @payment_method = mock_model(Spree::PaymentMethod, :type => 'Spree::PaymentMethod::UnifiedPaymentMethod')
+        @payment_method.stub(:is_a?).with(Spree::PaymentMethod::UnifiedPaymentMethod).and_return(true)
       end
 
       context 'when params[:order].present?' do
@@ -57,7 +58,7 @@ describe Spree::CheckoutController do
 
         describe 'method calls' do
           it { order.should_receive(:update_attributes).with('object_params').and_return(false) }
-          it { @payment_method.should_receive(:try).with(:type).and_return('Spree::PaymentMethod::UnifiedPaymentMethod') }
+          it { @payment_method.should_receive(:is_a?).with(Spree::PaymentMethod::UnifiedPaymentMethod).and_return(true) }
           it { Spree::PaymentMethod.should_receive(:where).with(:id => '1').and_return([@payment_method]) }
           it { order.should_not_receive(:update) }
           after { send_request({"order"=>{"payments_attributes"=>[{"payment_method_id"=>"1"}]}, "state"=>"payment"}) }

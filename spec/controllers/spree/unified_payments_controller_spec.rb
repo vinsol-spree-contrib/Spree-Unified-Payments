@@ -46,7 +46,7 @@ describe Spree::UnifiedPaymentsController do
 
         it 'sets flash message' do
           send_request
-          flash[:error].should eq('No Order')
+          flash[:error].should eq('Order not found')
         end
       end
 
@@ -144,19 +144,19 @@ describe Spree::UnifiedPaymentsController do
         @gateway_response = Object.new
         UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(@gateway_response)
         UnifiedPayment::Transaction.stub(:extract_url_for_unified_payment).with(@gateway_response).and_return('www.MyTestSite.com')
-        controller.stub(:tasks_after_order_create).with(@gateway_response, '12345678910121').and_return(true)
+        controller.stub(:tasks_on_gateway_create_response).with(@gateway_response, '12345678910121').and_return(true)
       end
 
       context 'with a pending card transaction' do
         before do
           @pending_card_transaction = mock_model(UnifiedPayment::Transaction, :payment_transaction_id => '98765432110112')
-          @pending_card_transaction.stub(:try).with(:abort!).and_return(true)
+          @pending_card_transaction.stub(:abort!).and_return(true)
           order.stub(:pending_card_transaction).and_return(@pending_card_transaction)
         end
 
         describe 'method calls' do
           it { order.should_receive(:pending_card_transaction).and_return(@pending_card_transaction) }
-          it { @pending_card_transaction.should_receive(:try).with(:abort!).and_return(true) }
+          it { @pending_card_transaction.should_receive(:abort!).and_return(true) }
         
           after { send_request }
         end
@@ -177,7 +177,7 @@ describe Spree::UnifiedPaymentsController do
         describe 'method calls' do
           it { UnifiedPayment::Transaction.should_receive(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(@gateway_response) }
           it { UnifiedPayment::Transaction.should_receive(:extract_url_for_unified_payment).with(@gateway_response).and_return('www.MyTestSite.com') }
-          it { controller.should_receive(:tasks_after_order_create).with(@gateway_response, '12345678910121').and_return(true) }
+          it { controller.should_receive(:tasks_on_gateway_create_response).with(@gateway_response, '12345678910121').and_return(true) }
           
           after { send_request }
         end
@@ -197,7 +197,7 @@ describe Spree::UnifiedPaymentsController do
         describe 'method calls' do
           it { UnifiedPayment::Transaction.should_receive(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(false) }
           it { UnifiedPayment::Transaction.should_not_receive(:extract_url_for_unified_payment) }
-          it { controller.should_not_receive(:tasks_after_order_create) }
+          it { controller.should_not_receive(:tasks_on_gateway_create_response) }
           
           after { send_request }
         end
@@ -225,7 +225,7 @@ describe Spree::UnifiedPaymentsController do
       end
     end
 
-    describe '#tasks_after_order_create' do
+    describe '#tasks_on_gateway_create_response' do
       def send_request(params = {})
         post :create, params.merge!({:use_route => 'spree'})
       end

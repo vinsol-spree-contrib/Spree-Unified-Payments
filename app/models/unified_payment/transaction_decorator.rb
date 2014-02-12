@@ -9,7 +9,8 @@ UnifiedPayment::Transaction.class_eval do
   after_create :enqueue_expiration_task, :if => [:payment_transaction_id?]
 
   #[TODO_CR] we should move conditions written below for all callbacks into methods.
-  after_save :notify_user, :if => [:status_changed?, "status_was == 'pending'"]
+  #[MK] Please site an example.
+  after_save :notify_user_on_transaction_status, :if => [:status_changed?, "status_was == 'pending'"]
   before_save :assign_attributes_using_xml, :if => [:status_changed?, "status != 'pending'"]
   after_save :complete_order, :if => [:status_changed?, :payment_valid_for_order?, "status == 'successful' && !order_inventory_released?"]
   after_save :wallet_transaction, :if => [:status_changed? ,"(!payment_valid_for_order? || order_inventory_released?) && status == 'successful'"]
@@ -26,7 +27,8 @@ UnifiedPayment::Transaction.class_eval do
 
   def abort!
     #[TODO_CR] Use Time.current
-    update_attribute(:expired_at, Time.now)
+    #[MK] Fixed
+    update_attribute(:expired_at, Time.current)
   end
 
   def pending?
@@ -38,16 +40,22 @@ UnifiedPayment::Transaction.class_eval do
     store_credit_balance = user.store_credits_total + amount.to_f
 
     #[TODO_CR] not sure why payment mode is -1
+    #[MK] Please Refer to the way store credit is built for details.    
     store_credit = build_store_credit(:balance => store_credit_balance, :user => user, :transactioner => (transactioner || user), :amount => amount.to_f, :reason => "transferred from transaction:#{payment_transaction_id}", :payment_mode => -1, :type => "Spree::Credit")
     store_credit.save!
   end
 
+  def pending?
+    status == 'pending'
+  end
+  
   private
 
   def associate_user
     associate_with_user = Spree::User.where(:email => order.email).first
     #[TODO_CR] do we really need .nil? here
-    if associate_with_user.nil?
+    #[MK] using unless now.
+    unless associate_with_user
       associate_with_user = Spree::User.create_unified_transaction_user(order.email)
     end
     self.user = associate_with_user
@@ -68,8 +76,9 @@ UnifiedPayment::Transaction.class_eval do
   #[TODO_CR] The delivery should be asyncronous (via delayed_job) 
   # I thing delayed job is already a depency for this
   # name should be somthing like deliver_transaction_status_email/notify_user_on_transaction_status
-  def notify_user
-    Spree::TransactionNotificationMailer.send_mail(self).deliver!
+  # [MK] Changed to use dalyed job.
+  def notify_user_on_transaction_status
+    Spree::TransactionNotificationMailer.delay.send_mail(self)
   end
 
   def release_order_inventory

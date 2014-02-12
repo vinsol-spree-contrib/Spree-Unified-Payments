@@ -14,7 +14,7 @@ describe Spree::Order do
       UnifiedPayment::Transaction.any_instance.stub(:enqueue_expiration_task).and_return(true)
       UnifiedPayment::Transaction.any_instance.stub(:assign_attributes_using_xml).and_return(true)
       UnifiedPayment::Transaction.any_instance.stub(:complete_order).and_return(true)
-      UnifiedPayment::Transaction.any_instance.stub(:notify_user).and_return(true)
+      UnifiedPayment::Transaction.any_instance.stub(:notify_user_on_transaction_status).and_return(true)
       @successful_card_transaction = @order.unified_transactions.create!(:status => 'successful', :payment_transaction_id => '1234')
       @pending_card_transaction = @order.unified_transactions.create!(:status => 'pending', :payment_transaction_id => '1234')
     end

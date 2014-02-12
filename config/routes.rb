@@ -2,9 +2,9 @@ Spree::Core::Engine.routes.prepend do
   get '/unified_payments', :to => "unified_payments#index"
   get '/unified_payments/new', :to => "unified_payments#new", :as => :new_unified_transaction
   post '/unified_payments/create', :to => "unified_payments#create", :as => :create_unified_transaction
-  post '/unified_payments/canceled', :to => "unified_payments#canceled"
-  post '/unified_payments/declined', :to => "unified_payments#declined"
-  post '/unified_payments/approved', :to => "unified_payments#approved"
+  post '/unified_payments/canceled', :to => "unified_payments#canceled", :as => :canceled_unified_payments
+  post '/unified_payments/declined', :to => "unified_payments#declined", :as => :declined_unified_payments
+  post '/unified_payments/approved', :to => "unified_payments#approved", :as => :approved_unified_payments
   get '/unified_payments/declined', :to => redirect{ |p, request| '/' }
 
   namespace :admin do

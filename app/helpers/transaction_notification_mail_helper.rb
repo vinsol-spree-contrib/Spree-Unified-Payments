@@ -2,6 +2,7 @@ module TransactionNotificationMailHelper
 
   # [TODO_CR] Not sure why we are extracting these values from xml_response.
   # haven't we already extracted these and stored in out db (atleast those we need to send in email)
+  #[MK] I dont think everything is extracted. Please refer DB structure.
   def mail_content_hash_for_unified(info_hash, card_transaction)
     send_info = {}
     
