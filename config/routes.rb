@@ -1,5 +1,5 @@
 Spree::Core::Engine.routes.prepend do
-  get '/unified_payments', :to => "unified_payments#index"
+  get '/unified_payments', :to => "unified_payments#index", :as => :unified_payments
   get '/unified_payments/new', :to => "unified_payments#new", :as => :new_unified_transaction
   post '/unified_payments/create', :to => "unified_payments#create", :as => :create_unified_transaction
   post '/unified_payments/canceled', :to => "unified_payments#canceled", :as => :canceled_unified_payments
