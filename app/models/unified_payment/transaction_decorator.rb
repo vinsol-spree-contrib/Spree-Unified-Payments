@@ -9,12 +9,12 @@ UnifiedPayment::Transaction.class_eval do
   after_create :enqueue_expiration_task, :if => [:payment_transaction_id?]
 
   #[TODO_CR] we should move conditions written below for all callbacks into methods.
-  #[MK] Please site an example.
+  #[MK] Moved some conditions as methods.
   after_save :notify_user_on_transaction_status, :if => [:status_changed?, "status_was == 'pending'"]
-  before_save :assign_attributes_using_xml, :if => [:status_changed?, "status != 'pending'"]
-  after_save :complete_order, :if => [:status_changed?, :payment_valid_for_order?, "status == 'successful' && !order_inventory_released?"]
-  after_save :wallet_transaction, :if => [:status_changed? ,"(!payment_valid_for_order? || order_inventory_released?) && status == 'successful'"]
-  after_save :cancel_order, :if => [:status_changed?, "status == 'unsuccessful'"]
+  before_save :assign_attributes_using_xml, :if => [:status_changed?, "!pending?"]
+  after_save :complete_order, :if => [:status_changed?, :payment_valid_for_order?, :successful? ,"!order_inventory_released?"]
+  after_save :wallet_transaction, :if => [:status_changed? ,"(!payment_valid_for_order? || order_inventory_released?)", :successful?]
+  after_save :cancel_order, :if => [:status_changed?, :unsuccessful?]
   after_save :release_order_inventory, :if => [:expired_at?, "expired_at_was == nil"]
 
   def payment_valid_for_order?
@@ -29,8 +29,12 @@ UnifiedPayment::Transaction.class_eval do
     update_attribute(:expired_at, Time.current)
   end
 
-  def pending?
-    status == 'pending'
+  def successful?
+    status == 'successful'
+  end
+
+  def unsuccessful?
+    status == 'unsuccessful'
   end
 
   def wallet_transaction(transactioner = nil)
@@ -47,6 +51,12 @@ UnifiedPayment::Transaction.class_eval do
     status == 'pending'
   end
   
+  def update_transaction_on_query(gateway_order_status)
+    update_hash = gateway_order_status == "APPROVED" ? {:status => 'successful'} : {}
+    assign_attributes({:gateway_order_status => gateway_order_status}.merge(update_hash))
+    save(:validate => false)
+  end
+
   private
 
   def associate_user

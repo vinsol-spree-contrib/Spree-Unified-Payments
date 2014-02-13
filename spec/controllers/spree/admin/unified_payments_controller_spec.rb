@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Spree::Admin::UnifiedPaymentsController do
   let(:user) { mock_model(Spree::User) }
   let(:role) { mock_model(Spree::Role) }
-  let(:card_transaction) { mock_model(UnifiedPayment::Transaction, :gateway_order_id => '123213', :gateway_session_id => '1212', :payment_transaction_id => '123456', :xml_response => '<Message>123</Message>') }
+  let(:card_transaction) { UnifiedPayment::Transaction.new( :gateway_order_id => '123213', :gateway_session_id => '1212', :payment_transaction_id => '123456', :xml_response => '<Message>123</Message>') }
   let(:order) { mock_model(Spree::Order) }
   let(:roles) { [role] }
 
@@ -53,30 +53,52 @@ describe Spree::Admin::UnifiedPaymentsController do
       get :receipt, params.merge!(:use_route => 'spree')
     end
 
-    before do
-      UnifiedPayment::Transaction.stub(:where).with(:payment_transaction_id => '123456').and_return([card_transaction])
-    end
-    
-    describe 'method calls' do
-      it { UnifiedPayment::Transaction.should_receive(:where).with(:payment_transaction_id => '123456').and_return([card_transaction]) }
-      it { card_transaction.should_receive(:order).and_return(order)}
-
-      after do
-        send_request(:transaction_id => '123456')
-      end
-    end
-
-    it 'should render no layout' do
-      send_request(:transaction_id => '123456')  
-      response.should render_template(:layout => false)
-    end
-
-    describe 'assigns' do
+    context 'Transaction present' do
       before do
-        send_request(:transaction_id => '123456')
+        UnifiedPayment::Transaction.stub(:where).with(:payment_transaction_id => '123456').and_return([card_transaction])
       end
       
-      it { assigns(:message).should eq('123') }
+      describe 'method calls' do
+        it { UnifiedPayment::Transaction.should_receive(:where).with(:payment_transaction_id => '123456').and_return([card_transaction]) }
+        it { card_transaction.should_receive(:order).and_return(order)}
+
+        after do
+          send_request(:transaction_id => '123456')
+        end
+      end
+
+      it 'should render no layout' do
+        send_request(:transaction_id => '123456')  
+        response.should render_template(:layout => false)
+      end
+
+      describe 'assigns' do
+        before do
+          send_request(:transaction_id => '123456')
+        end
+        
+        it { assigns(:message).should eq('123') }
+      end
+    end
+
+    context 'No transaction present' do
+      before do
+        UnifiedPayment::Transaction.stub(:where).with(:payment_transaction_id => '123456').and_return([])
+      end
+      
+      describe 'method calls' do
+        it { UnifiedPayment::Transaction.should_receive(:where).with(:payment_transaction_id => '123456').and_return([]) }
+        it { card_transaction.should_not_receive(:order) }
+
+        after do
+          send_request(:transaction_id => '123456')
+        end
+      end
+
+      it 'renders js' do
+        send_request(:transaction_id => '123456')
+        response.body.should eq("alert('Could not find transaction')")
+      end
     end
   end
 
@@ -86,29 +108,17 @@ describe Spree::Admin::UnifiedPaymentsController do
     end
 
     before do
-      card_transaction.stub(:assign_attributes).with(:gateway_order_status => "MyStatus").and_return(true)
-      card_transaction.stub(:save).with(:validate => false).and_return(true)
+      card_transaction.stub(:update_transaction_on_query).with("MyStatus").and_return(true)
       UnifiedPayment::Transaction.stub(:where).with(:payment_transaction_id => '123456').and_return([card_transaction])
       UnifiedPayment::Client.stub(:get_order_status).with(card_transaction.gateway_order_id, card_transaction.gateway_session_id).and_return({"orderStatus" => 'MyStatus'})
     end
 
     describe 'method calls' do
       it { UnifiedPayment::Client.should_receive(:get_order_status).with(card_transaction.gateway_order_id, card_transaction.gateway_session_id).and_return({"orderStatus" => 'MyStatus'}) }
-      it { card_transaction.should_receive(:assign_attributes).with(:gateway_order_status => 'MyStatus').and_return(true) }
-      it { card_transaction.should_receive(:save).with(:validate => false).and_return(true) }
+      it { card_transaction.should_receive(:update_transaction_on_query).with('MyStatus').and_return(true) }
       after do
         send_request(:transaction_id => '123456')
       end
-    end
-
-    describe 'assigns' do
-      before do
-        send_request(:transaction_id => '123456')
-      end
-
-      it { assigns(:update_transaction).should be_nil }
-      it { assigns(:payment_transaction_id).should eq(card_transaction.payment_transaction_id) }
-      it { assigns(:order_status).should eq('MyStatus') }
     end
 
     describe 'before filters' do
@@ -124,12 +134,10 @@ describe Spree::Admin::UnifiedPaymentsController do
     context 'approved status fetched' do
       before do
         UnifiedPayment::Client.stub(:get_order_status).with(card_transaction.gateway_order_id, card_transaction.gateway_session_id).and_return({"orderStatus" => 'APPROVED'})
-        card_transaction.stub(:assign_attributes).with(:gateway_order_status => 'APPROVED', :status => 'successful').and_return(true)
-        card_transaction.stub(:save).with(:validate => false).and_return(true)
+        card_transaction.stub(:update_transaction_on_query).with('APPROVED').and_return(true)
       end
 
-      it { card_transaction.should_receive(:assign_attributes).with(:gateway_order_status => 'APPROVED', :status => 'successful').and_return(true) }
-      it { card_transaction.should_receive(:save).with(:validate => false).and_return(true) }
+      it { card_transaction.should_receive(:update_transaction_on_query).with('APPROVED').and_return(true) }
 
       after do
         send_request(:transaction_id => '123456')
@@ -137,9 +145,8 @@ describe Spree::Admin::UnifiedPaymentsController do
     end
 
     context 'approved status not fetched' do
-      before { card_transaction.stub(:save).with(:validate => false).and_return(true) }
-      it { card_transaction.should_receive(:assign_attributes).with(:gateway_order_status => 'MyStatus') }
-      it { card_transaction.should_receive(:save).with(:validate => false).and_return(true) }
+      it { card_transaction.should_receive(:update_transaction_on_query).with('MyStatus') }
+      
       after do
         send_request(:transaction_id => '123456')
       end

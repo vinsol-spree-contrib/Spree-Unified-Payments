@@ -337,14 +337,24 @@ describe UnifiedPayment::Transaction do
     end
   end
 
-  describe '#pending?' do
+  describe 'status checks for pening, unsuccessful and successful' do
     before do
       @successful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'successful', :payment_transaction_id => '1234')
       @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234')
+      @unsuccessful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'unsuccessful', :payment_transaction_id => '1234')
     end
-    
+
     it { @successful_card_transaction.pending?.should be_false }
+    it { @successful_card_transaction.successful?.should be_true }
+    it { @successful_card_transaction.unsuccessful?.should be_false }
+
+    it { @unsuccessful_card_transaction.successful?.should be_false }
+    it { @unsuccessful_card_transaction.pending?.should be_false }
+    it { @unsuccessful_card_transaction.unsuccessful?.should be_true }
+
     it { @pending_card_transaction.pending?.should be_true } 
+    it { @pending_card_transaction.successful?.should be_false } 
+    it { @pending_card_transaction.unsuccessful?.should be_false } 
   end
 
   describe '#enqueue_expiration_task' do
@@ -452,6 +462,22 @@ describe UnifiedPayment::Transaction do
         @card_transaction.send(:associate_user)
         @card_transaction.user.should eq(user)
       end
+    end
+  end
+
+  describe '#update_transaction_on_query' do
+    before { @card_transaction = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123454321') }
+    
+    context 'status is APPROVED' do
+      it { @card_transaction.should_receive(:assign_attributes).with(:gateway_order_status => 'APPROVED', :status => 'successful').and_return(true) }
+      it { @card_transaction.should_receive(:save).with(:validate => false).and_return(true) }
+      after { @card_transaction.update_transaction_on_query('APPROVED') }
+    end
+
+    context 'status is APPROVED' do
+      it { @card_transaction.should_receive(:assign_attributes).with(:gateway_order_status => 'MyStatus').and_return(true) }
+      it { @card_transaction.should_receive(:save).with(:validate => false).and_return(true) }
+      after { @card_transaction.update_transaction_on_query('MyStatus') }
     end
   end
 end

@@ -85,7 +85,7 @@
             <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>
             <% unless card_transaction.store_credit.present? %>
               <!-- [TODO_CR] NOt sure why urls are hardcoded instead of using rails routes helpers -->
-              |<%= link_to "Receipt", "/admin/unified_payments/receipt/#{card_transaction.payment_transaction_id}" %>
+              |<%= link_to "Receipt", unified_payments_receipt(:transaction_id => card_transaction.payment_transaction_id)" %>
             <% end %>
           <% else %>
             <%= link_to("QueryAndWallet", admin_unified_payments_query_gateway_path(:transaction_id => card_transaction.payment_transaction_id), :remote => true, confirm: "#{card_transaction.amount} will be walleted to #{card_transaction.user.try(:email) }. Are You Sure?", :method => 'post', :class => 'wallet_link') unless card_transaction.store_credit.present? %>

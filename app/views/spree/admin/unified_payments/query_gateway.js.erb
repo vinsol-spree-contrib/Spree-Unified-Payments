@@ -1,13 +1,13 @@
 // [TODO_CR] Instead of @order_status. We should check unified_payments_transaction status here
 // unified_payments_transaction.successful?
 // Are we crediting user in wallet all the time?
-//[MK] The check seems fine.
+//[MK] The changed.
 //[MK] It wont happen all the time. refer to model/callback
-<% if @order_status == "APPROVED" %>
+<% if @card_transaction.successful? %>
   alert('Successfully walleted');
   $('#<%= @card_transaction.payment_transaction_id %> .action .wallet_link').hide();
-  $('#<%= @payment_transaction_id %> .gateway_order_status').text('<%= @order_status %>')
+  $('#<%= @card_transaction.payment_transaction_id %> .gateway_order_status').text('<%= @card_transaction.gateway_order_status %>')
 <% else %>
-  alert('Could not wallet the money. Got order status <%= @order_status %>');
-  $('#<%= @payment_transaction_id %> .gateway_order_status').text('<%= @order_status %>')
+  alert('Could not wallet the money. Got order status <%= @card_transaction.gateway_order_status %>');
+  $('#<%= @card_transaction.payment_transaction_id %> .gateway_order_status').text('<%= @@card_transaction.gateway_order_status %>')
 <% end %>

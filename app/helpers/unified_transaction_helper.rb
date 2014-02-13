@@ -11,7 +11,7 @@ module UnifiedTransactionHelper
   # end while UnifiedPayment::Transaction.exists?(payment_transaction_id: payment_transaction_id)
   # payment_transaction_id
   #[MK] This method would allow infinite attempts. It was suggested to do 3 attempts at the first place.
-
+  #[MK] A unique transaction id will get created by the third attempt even in the rarest of the case hence returning @transction_id without any check
   def generate_transaction_id
     (1..3).each do |attempt|
       @transaction_id = generate_id_using_timestamp + attempt.to_s

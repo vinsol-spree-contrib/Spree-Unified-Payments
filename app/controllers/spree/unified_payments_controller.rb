@@ -10,7 +10,7 @@ module Spree
     before_filter :ensure_valid_order, :only => [:new, :create]    
     skip_before_filter :verify_authenticity_token, :only => [:approved, :declined, :canceled]
 
-    before_filter :load_order_on_return, :only => [:declined, :canceled, :approved]
+    before_filter :load_info_on_return, :only => [:declined, :canceled, :approved]
     before_filter :ensure_session_transaction_id, :abort_pending_transactions, :only => :create
 
     def index
@@ -46,7 +46,7 @@ module Spree
     end
 
     #[TODO_CR] We should decompose this method?
-    #[MK] Not able to break it down any further.
+    #[MK] Done
     def approved
       @transaction_expired = @card_transaction.expired_at?
       @card_transaction.xml_response = params[:xmlmsg]
@@ -54,29 +54,37 @@ module Spree
       @payment_made = @gateway_message_hash['PurchaseAmountScr'].to_f
       if @card_transaction.approved_at_gateway?
         if @card_transaction.amount != @payment_made
-          add_error("Payment made was not same as requested to gateway. Please contact administrator for queries.")
-          @card_transaction.status = 'unsuccessful'
+          process_unsuccessful_transaction
         else
-          @card_transaction.status = 'successful'
-
-          if @transaction_expired
-            add_error("Payment was successful but transaction has expired. The payment made has been walleted in your account. Please contact administrator to help you further.")
-          elsif @order.paid? || @order.completed?
-            add_error("Order Already Paid Or Completed")
-          elsif @order.total != @payment_made
-            add_error("Payment made is different from order total. Payment made has been walleted to your account.")
-          end
+          process_successful_transaction
         end
       else
         add_error("Not Approved At Gateway")
       end
       #[TODO_CR] I think I am missing something here. Why we are saving without validations?
-      #[MK] Because validations are needed for this save, the state was just updated, nothing else
+      #[MK] No validations cant be added in the extension else it will hinder working in the gem
       @card_transaction.save(:validate => false)
     end
 
     private
     
+    def process_unsuccessful_transaction
+      add_error("Payment made was not same as requested to gateway. Please contact administrator for queries.")
+      @card_transaction.status = 'unsuccessful'
+    end
+
+    def process_successful_transaction
+      @card_transaction.status = 'successful'
+
+      if @transaction_expired
+        add_error("Payment was successful but transaction has expired. The payment made has been walleted in your account. Please contact administrator to help you further.")
+      elsif @order.paid? || @order.completed?
+        add_error("Order Already Paid Or Completed")
+      elsif @order.total != @payment_made
+        add_error("Payment made is different from order total. Payment made has been walleted to your account.")
+      end
+    end
+
     def abort_pending_transactions
       pending_card_transaction = @order.pending_card_transaction
       pending_card_transaction.abort! if pending_card_transaction
@@ -98,12 +106,12 @@ module Spree
     end
 
     #[TODO_CR] Instead of using if !current_order we should use if current_order and switch code between if and else blocks
-    #[MK] How does it make it better?
+    #[MK] Changed.
     def order_invalid_with_message
-      if !current_order 
-        'Order not found'
-      else 
+      if current_order 
         current_order.reason_if_cant_pay_by_card
+      else 
+        'Order not found'
       end
     end
 
@@ -125,7 +133,7 @@ module Spree
 
     #[TODO_CR] It should be load_transaction OR find_transaction
     #[MK] load_order_on_return seems better than load_order_on_redirect since it emphasises load on return from gateway making it more specific
-    def load_order_on_return
+    def load_info_on_return
       @gateway_message_hash = Hash.from_xml(params[:xmlmsg])['Message']
       if @card_transaction = UnifiedPayment::Transaction.where(:gateway_order_id => @gateway_message_hash['OrderID']).first
         @order = @card_transaction.order
@@ -147,6 +155,8 @@ module Spree
       
       # :status and currency assignment should be in model before validation/create
       #[MK] same as above for status, currency assignment seems to be fine here
+      
+      #[MK] Cant do assignment in callbacks as it will hinder working of gem as discussed
       gateway_transaction = UnifiedPayment::Transaction.where(:gateway_session_id => response_order['SessionID'], :gateway_order_id => response_order['OrderID'], :url => response_order['URL']).first
       gateway_transaction.assign_attributes(:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending')
       gateway_transaction.save!
@@ -160,8 +170,8 @@ module Spree
       unless session[:transaction_id]
         flash[:error] = "No transaction id found, please try again"
         #[TODO_CR] No url hard coding 
-        #[MK] Please suggest changes.
-        render js: "top.location.href = '#{root_url}checkout/payment'"
+        #[MK] Fixed.
+        render js: "top.location.href = '#{checkout_state_url('payment')}'"
       end
     end
   end

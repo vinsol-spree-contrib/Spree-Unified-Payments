@@ -23,18 +23,17 @@ module Spree
 
       def query_gateway
         #[TODO_CR] Use @unified_payment_transaction.transaction_id Instead of defining another variable
-        #[MK] Also needed in view.
-        @payment_transaction_id = params[:transaction_id]
-        @response = UnifiedPayment::Client.get_order_status(@card_transaction.gateway_order_id, @card_transaction.gateway_session_id)
+        #[MK] Fixed.
+        response = UnifiedPayment::Client.get_order_status(@card_transaction.gateway_order_id, @card_transaction.gateway_session_id)
 
         #[TODO_CR] Do we really need this variable?
-        #[MK] Also needed in view.
-        @order_status = @response["orderStatus"]
+        #[MK] made response a local variable instead.
+        # @order_status = response["orderStatus"]
 
         #[TODO_CR] I thisnk this should be moved to model (UnifiedPayment::Transaction)
         # Also Aren't we doing same thing for user part too.
-        #[MK] Cant understand what is that you are referring to. The method is mentioned as a private method within the controller for modularization
-        update_transaction_on_query(@card_transaction, @order_status)
+        #[MK] Moved.
+        @card_transaction.update_transaction_on_query(response["orderStatus"])
       end
 
       private
@@ -43,16 +42,9 @@ module Spree
         #[TODO_CR] I thing inplace of card_transaction we should use @unified_payment_transaction. This will reduce the consfusion.
         # What if transaction is not found?  We should handle this too.
         #[MK] All card transaction would be unified only since this is an extension. There should be no confusion.
-        #[MK] Its Admin end, hence transaction check is not that needed.
+        #[MK] Check added.
         @card_transaction = UnifiedPayment::Transaction.where(:payment_transaction_id => params[:transaction_id]).first
-      end
-
-      def update_transaction_on_query(card_transaction, gateway_order_status)
-        update_hash = gateway_order_status == "APPROVED" ? {:status => 'successful'} : {}
-        card_transaction.assign_attributes({:gateway_order_status => gateway_order_status}.merge(update_hash))
-        #[TODO_CR] why saving without validations
-        #[MK] Responded in unified_payments_controller
-        card_transaction.save(:validate => false)
+        render js: "alert('Could not find transaction')" unless @card_transaction
       end
     end
   end
