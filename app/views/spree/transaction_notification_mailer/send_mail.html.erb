@@ -1,7 +1,7 @@
 
 <table border="0" cellpadding="5" cellspacing="0">
   <tr>
-    <th colspan="2" align="left">Your Unified Payment Transaction was <%= @status %>. Below mentioned are the details</th>
+    <th colspan="2" align="left">Your Unified Payment Transaction was <%= @card_transaction.status %>. Below mentioned are the details</th>
   </tr>
   <% mail_content_hash_for_unified(@message, @card_transaction).each_pair do |key, value| %>
   <tr>
@@ -11,10 +11,10 @@
   <% end %>
   <tr>
     <td>Order Description</td>
-    <% if @order.line_items.count == 1 %>
-      <td>: Payment for <%= @order.line_items.first.product.name + " at #{Spree::Config[:site_name]}"%></td>
+    <% if @card_transaction.order.line_items.count == 1 %>
+      <td>: Payment for <%= @card_transaction.order.line_items.first.product.name + " at #{Spree::Config[:site_name]}"%></td>
     <% else %>
-      <td>: Payment for <%= @order.line_items.count.to_s + " products at #{Spree::Config[:site_name]}"%></td>
+      <td>: Payment for <%= @card_transaction.order.line_items.count.to_s + " products at #{Spree::Config[:site_name]}"%></td>
     <% end %>
   </tr>
 </table>
