@@ -26,8 +26,6 @@ UnifiedPayment::Transaction.class_eval do
   end
 
   def abort!
-    #[TODO_CR] Use Time.current
-    #[MK] Fixed
     update_attribute(:expired_at, Time.current)
   end
 
@@ -53,8 +51,6 @@ UnifiedPayment::Transaction.class_eval do
 
   def associate_user
     associate_with_user = Spree::User.where(:email => order.email).first
-    #[TODO_CR] do we really need .nil? here
-    #[MK] using unless now.
     unless associate_with_user
       associate_with_user = Spree::User.create_unified_transaction_user(order.email)
     end
@@ -73,10 +69,6 @@ UnifiedPayment::Transaction.class_eval do
     end
   end
 
-  #[TODO_CR] The delivery should be asyncronous (via delayed_job) 
-  # I thing delayed job is already a depency for this
-  # name should be somthing like deliver_transaction_status_email/notify_user_on_transaction_status
-  # [MK] Changed to use dalyed job.
   def notify_user_on_transaction_status
     Spree::TransactionNotificationMailer.delay.send_mail(self)
   end

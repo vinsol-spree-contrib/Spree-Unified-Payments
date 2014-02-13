@@ -11,8 +11,6 @@ Spree::CheckoutController.class_eval do
     payment_method_id = params[:order][:payments_attributes][0][:payment_method_id] if params[:order] && params[:order][:payments_attributes]
     payment_method = Spree::PaymentMethod.where(:id => payment_method_id).first
 
-    #[TODO_CR] this should be done like payment_method.is_a?(Spree::PaymentMethod::UnifiedPaymentMethod)
-    #[MK] Fixed. Looks Nicer.
     if payment_method.is_a?(Spree::PaymentMethod::UnifiedPaymentMethod)
       @order.update_attributes(object_params)
       redirect_to new_unified_transaction_path

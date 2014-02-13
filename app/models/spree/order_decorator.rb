@@ -4,7 +4,6 @@ Spree::Order.class_eval do
     unified_transactions.pending.first
   end
 
-  #[TODO] Are we using this outside too? If not this should be private
   def release_inventory
     shipments.each do |shipment|
       shipment.cancel if shipment.inventory_units.any? { |iu| iu.pending == false }

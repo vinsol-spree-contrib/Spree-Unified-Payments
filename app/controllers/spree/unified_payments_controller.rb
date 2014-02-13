@@ -22,12 +22,7 @@ module Spree
     end
 
     def create
-      #[TODO_CR] Extract this in a before filter and I am not sure why we are using try here, instead use if pending_card_transaction
-      #[MK] Fixed.
-
-      #[TODO_CR] Instead of root_url why we are not using approved_unified_payments_url
       # We also can extract these options is a method.
-      #[MK] used route helpers, looks nicer.
       #[MK] it was decided not giving any options since we want the requested to be redirected defined methods only
       response = UnifiedPayment::Transaction.create_order_at_unified(@order.total, { :approve_url => approved_unified_payments_url, :cancel_url => canceled_unified_payments_url, :decline_url => declined_unified_payments_url, :description => "Purchasing items from #{Spree::Config[:site_name]}" })
       if response
@@ -106,8 +101,6 @@ module Spree
     #[MK] How does it make it better?
     def order_invalid_with_message
       if !current_order 
-        #[TODO_CR] It should be "Order not found"
-        #[MK] Changed.
         'Order not found'
       else 
         current_order.reason_if_cant_pay_by_card
@@ -144,9 +137,6 @@ module Spree
       end
     end
 
-    #[TODO_CR] It seems the make of this method is not appropriate. It seems its doing things after spree_order create.
-    # It should be somthing like. tasks_after_response_from_gateway. What you think?
-    #[MK] Right. How about tasks_on_gateway_create_response? tasks_after_response can be for any or all responses
     def tasks_on_gateway_create_response(response, transaction_id)
       response_order = response['Order']
 
