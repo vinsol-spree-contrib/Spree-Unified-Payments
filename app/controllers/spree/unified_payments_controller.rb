@@ -10,7 +10,7 @@ module Spree
     before_filter :ensure_valid_order, :only => [:new, :create]    
     skip_before_filter :verify_authenticity_token, :only => [:approved, :declined, :canceled]
 
-    before_filter :load_order_on_redirect, :only => [:declined, :canceled, :approved]
+    before_filter :load_order_on_return, :only => [:declined, :canceled, :approved]
     before_filter :ensure_session_transaction_id, :abort_pending_transactions, :only => :create
 
     def index
@@ -112,8 +112,8 @@ module Spree
         flash[:error] = @invalid_order_message
 
         #[TODO_CR] Any reason of not using cart_path
-        #[MK] Any reason for using it?
-        redirect_to '/cart'
+        #[MK] Changed.
+        redirect_to cart_path
       else 
         load_order
       end
@@ -124,16 +124,16 @@ module Spree
     end
 
     #[TODO_CR] It should be load_transaction OR find_transaction
-    #[MK] the target is to load the order through transaction, plus its on redirect so the naming seems apt here
-    def load_order_on_redirect
+    #[MK] load_order_on_return seems better than load_order_on_redirect since it emphasises load on return from gateway making it more specific
+    def load_order_on_return
       @gateway_message_hash = Hash.from_xml(params[:xmlmsg])['Message']
       if @card_transaction = UnifiedPayment::Transaction.where(:gateway_order_id => @gateway_message_hash['OrderID']).first
         @order = @card_transaction.order
       else
         flash[:error] = 'No transaction. Please contact our support team.'
         #[TODO_CR] Any reason of not using root_path
-        #[MK] Any reason for using it?        
-        redirect_to '/'
+        #[MK] Changed.        
+        redirect_to root_path
       end
     end
 

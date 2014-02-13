@@ -2,4 +2,5 @@
 <b>Reason : <%= @card_transaction.reload.response_description %></b><br>
 
 <!-- [TODO_CR] not sure why not using cart_path -->
-<%= link_to 'Back To Cart', '/cart', :target => "_parent", :class => 'button'  %>
+<!-- changed -->
+<%= link_to 'Back To Cart', cart_path, :target => "_parent", :class => 'button'  %>
