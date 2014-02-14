@@ -1,6 +1,4 @@
 <b>Transaction Failed.</b><br>
 <b>Reason : <%= @card_transaction.reload.response_description %></b><br>
 
-<!-- [TODO_CR] not sure why not using cart_path -->
-<!-- changed -->
 <%= link_to 'Back To Cart', cart_path, :target => "_parent", :class => 'button'  %>

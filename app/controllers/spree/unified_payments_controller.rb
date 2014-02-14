@@ -32,8 +32,6 @@ module Spree
         @error_message = "Could not create payment at unified, please pay by other methods or try again later." 
       end
 
-      #[TODO_CR] I guess this render belongs to if success condition.
-      #[MK] if refering to if response condition, it seems better to have response at the end here.
       render js: "$('#confirm_payment').hide();top.location.href = '#{@payment_url}'" if @payment_url
     end
 
@@ -45,8 +43,6 @@ module Spree
       transaction_unsuccesful_with_message("Successfully Canceled payment")
     end
 
-    #[TODO_CR] We should decompose this method?
-    #[MK] Done
     def approved
       @transaction_expired = @card_transaction.expired_at?
       @card_transaction.xml_response = params[:xmlmsg]
@@ -61,8 +57,7 @@ module Spree
       else
         add_error("Not Approved At Gateway")
       end
-      #[TODO_CR] I think I am missing something here. Why we are saving without validations?
-      #[MK] No validations cant be added in the extension else it will hinder working in the gem
+
       @card_transaction.save(:validate => false)
     end
 
@@ -92,21 +87,14 @@ module Spree
 
     def transaction_unsuccesful_with_message(message)
       @card_transaction.assign_attributes(:status => 'unsuccessful', :xml_response => params[:xmlmsg])
-
-      #[TODO_CR] Same as above Line#75
-      #[MK] Responded earlier.
       @card_transaction.save(:validate => false)
       flash[:error] = message
     end
 
-    #[TODO_CR] There should be some better way of doing this.
-    #[MK] like?
     def add_error(message)
       flash[:error] = flash[:error] ? [flash[:error], message].join('. ') : message
     end
 
-    #[TODO_CR] Instead of using if !current_order we should use if current_order and switch code between if and else blocks
-    #[MK] Changed.
     def order_invalid_with_message
       if current_order 
         current_order.reason_if_cant_pay_by_card
@@ -119,8 +107,6 @@ module Spree
       if @invalid_order_message = order_invalid_with_message
         flash[:error] = @invalid_order_message
 
-        #[TODO_CR] Any reason of not using cart_path
-        #[MK] Changed.
         redirect_to cart_path
       else 
         load_order
@@ -131,16 +117,12 @@ module Spree
       @order = current_order
     end
 
-    #[TODO_CR] It should be load_transaction OR find_transaction
-    #[MK] load_order_on_return seems better than load_order_on_redirect since it emphasises load on return from gateway making it more specific
     def load_info_on_return
       @gateway_message_hash = Hash.from_xml(params[:xmlmsg])['Message']
       if @card_transaction = UnifiedPayment::Transaction.where(:gateway_order_id => @gateway_message_hash['OrderID']).first
         @order = @card_transaction.order
       else
-        flash[:error] = 'No transaction. Please contact our support team.'
-        #[TODO_CR] Any reason of not using root_path
-        #[MK] Changed.        
+        flash[:error] = 'No transaction. Please contact our support team.'        
         redirect_to root_path
       end
     end
@@ -148,15 +130,7 @@ module Spree
     def tasks_on_gateway_create_response(response, transaction_id)
       response_order = response['Order']
 
-      #[TODO_CR] For most of the attributes mass assignment should not be allowed. Whay youy think?
-      #[MK] We are updating though the xml response, its fine to have mass assignment here. Any particular reason?
-      # Not sure why CREATED is hardcoded. It should be from response
-      #[MK] Please refer to the response on order creation, there is no mention of any state in the response. State is fetched only when we ping for order status.
-      
-      # :status and currency assignment should be in model before validation/create
-      #[MK] same as above for status, currency assignment seems to be fine here
-      
-      #[MK] Cant do assignment in callbacks as it will hinder working of gem as discussed
+      #[TODO_CR] Make required attributes protected and save them with without protection in the place where protection is not necessary.
       gateway_transaction = UnifiedPayment::Transaction.where(:gateway_session_id => response_order['SessionID'], :gateway_order_id => response_order['OrderID'], :url => response_order['URL']).first
       gateway_transaction.assign_attributes(:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending')
       gateway_transaction.save!
@@ -169,8 +143,6 @@ module Spree
     def ensure_session_transaction_id
       unless session[:transaction_id]
         flash[:error] = "No transaction id found, please try again"
-        #[TODO_CR] No url hard coding 
-        #[MK] Fixed.
         render js: "top.location.href = '#{checkout_state_url('payment')}'"
       end
     end

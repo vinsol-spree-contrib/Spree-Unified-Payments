@@ -8,8 +8,6 @@ UnifiedPayment::Transaction.class_eval do
   scope :pending, lambda { where :status => 'pending' }
   after_create :enqueue_expiration_task, :if => [:payment_transaction_id?]
 
-  #[TODO_CR] we should move conditions written below for all callbacks into methods.
-  #[MK] Moved some conditions as methods.
   after_save :notify_user_on_transaction_status, :if => [:status_changed?, "status_was == 'pending'"]
   before_save :assign_attributes_using_xml, :if => [:status_changed?, "!pending?"]
   after_save :complete_order, :if => [:status_changed?, :payment_valid_for_order?, :successful? ,"!order_inventory_released?"]

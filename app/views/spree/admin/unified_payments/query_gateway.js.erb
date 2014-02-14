@@ -1,7 +1,4 @@
-// [TODO_CR] Instead of @order_status. We should check unified_payments_transaction status here
-// unified_payments_transaction.successful?
 // Are we crediting user in wallet all the time?
-//[MK] The changed.
 //[MK] It wont happen all the time. refer to model/callback
 <% if @card_transaction.successful? %>
   alert('Successfully walleted');

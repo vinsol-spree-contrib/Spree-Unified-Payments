@@ -24,8 +24,6 @@ Spree::Order.class_eval do
   end
 
   def reason_if_cant_pay_by_card
-    #[TODO] total == 0 can be written as total.zero?
-    #[MK] Changed.
     if total.zero? then 'Order Total is invalid'
     elsif completed? then 'Order already completed'
     elsif insufficient_stock_lines.present? then 'An item in your cart has become unavailable.'

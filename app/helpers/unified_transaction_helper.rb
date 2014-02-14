@@ -3,15 +3,7 @@ module UnifiedTransactionHelper
     (amount.to_f)*100
   end
 
-  # [TODO_CR] transaction generation seems a complicated what if we do somthing like below mentioned
-  #
-  # payment_transaction_id=''
-  # begin
-  #   payment_transaction_id = generate_id_using_timestamp
-  # end while UnifiedPayment::Transaction.exists?(payment_transaction_id: payment_transaction_id)
-  # payment_transaction_id
-  #[MK] This method would allow infinite attempts. It was suggested to do 3 attempts at the first place.
-  #[MK] A unique transaction id will get created by the third attempt even in the rarest of the case hence returning @transction_id without any check
+  # [TODO_CR] Remove limit of 3 times from loop.
   def generate_transaction_id
     (1..3).each do |attempt|
       @transaction_id = generate_id_using_timestamp + attempt.to_s
