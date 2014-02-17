@@ -82,8 +82,6 @@
             <a href="javascript:void(0)" id="reveal_xml" data-ct-id=<%= card_transaction.id%>>View XML</a>
             <div class="hidden xml_response" id="xml_response_<%= card_transaction.id %>"><%= card_transaction.xml_response %></div>
             <% unless card_transaction.store_credit.present? %>
-              <!-- [TODO_CR] NOt sure why urls are hardcoded instead of using rails routes helpers -->
-              <!-- [MK] Done -->
               |<%= link_to "Receipt", unified_payments_receipt_path(:transaction_id => card_transaction.payment_transaction_id) %>
             <% end %>
           <% else %>

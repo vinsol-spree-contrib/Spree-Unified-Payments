@@ -3,8 +3,6 @@ module UnifiedTransactionHelper
     (amount.to_f)*100
   end
 
-  # [TODO_CR] Remove limit of 3 times from loop.
-  # [MK] Done.
   def generate_transaction_id
     begin
       payment_transaction_id = generate_id_using_timestamp
