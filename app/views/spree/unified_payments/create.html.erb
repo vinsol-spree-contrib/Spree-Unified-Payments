@@ -6,7 +6,3 @@
 <p>This transaction will expire in <%= TRANSACTION_LIFETIME %> minutes. Please finish payment within <%= TRANSACTION_LIFETIME %> minutes.</p>
 <a href=<%= @payment_url %> target='_parent' class="button">Proceed to Payment</a>
 <% end %>
-
-<!-- [TODO_CR] No inline js please -->
-<script>$('.notice').delay(5000).effect('fade', 2000)</script>
-  

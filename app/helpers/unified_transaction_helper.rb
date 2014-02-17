@@ -4,12 +4,12 @@ module UnifiedTransactionHelper
   end
 
   # [TODO_CR] Remove limit of 3 times from loop.
+  # [MK] Done.
   def generate_transaction_id
-    (1..3).each do |attempt|
-      @transaction_id = generate_id_using_timestamp + attempt.to_s
-      break if UnifiedPayment::Transaction.where(:payment_transaction_id => @transaction_id).blank?
-    end
-    @transaction_id
+    begin
+      payment_transaction_id = generate_id_using_timestamp
+    end while UnifiedPayment::Transaction.exists?(payment_transaction_id: payment_transaction_id)
+    payment_transaction_id
   end
 
   private

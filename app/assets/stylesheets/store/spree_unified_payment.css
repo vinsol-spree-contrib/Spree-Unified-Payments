@@ -1,0 +1,7 @@
+#approved_notice { font-family:Georgia, 'Times New Roman', Times, serif; letter-spacing:2px; font-size:12px; text-transform:uppercase; padding:20px; border:solid 1px #3333ff; background:#dedeff; color:#3333ff }
+#unified_payments_approved_info { width:100%; border:0px; cellspacing: 15; cellpadding: 0; }
+#unified_payments_approved_info td.info_attr { color:#000; font-family:Georgia, 'Times New Roman', Times, serif; letter-spacing:2px; font-size:12px; text-transform:uppercase; }
+#unified_payments_approved_info td.info_val { font-family:Arial, Helvetica, sans-serif; font-size:12px; color:#666; }
+#unified_payment_detail_link_container { display:block; padding:10px 0; font-family:Arial, Helvetica, sans-serif; font-size:14px; font-weight:bold; }
+#unified_payment_detail_link_container a { text-decoration:underline; color:#09F; }
+#approved_fail_notice { color:#EC1B23; border:solid 1px #EC1B23; font-family:Georgia, 'Times New Roman', Times, serif; letter-spacing:2px; font-size:12px; text-transform:uppercase; text-align:center; padding:20px 0; background:#ffe0e0; }

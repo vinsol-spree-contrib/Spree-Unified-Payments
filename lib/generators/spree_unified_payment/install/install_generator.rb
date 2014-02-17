@@ -6,9 +6,9 @@ module SpreeUnifiedPayment
         append_file 'app/assets/javascripts/admin/all.js', "//= require admin/spree_unified_payment\n"
       end
 
-      # def add_stylesheets
-      #   inject_into_file 'app/assets/stylesheets/admin/all.css', " *= require admin/spree_unified_payment\n", :before => /\*\//, :verbose => true
-      # end
+      def add_stylesheets
+        inject_into_file 'app/assets/stylesheets/store/all.css', " *= require store/spree_unified_payment\n", :before => /\*\//, :verbose => true
+      end
 
       def add_migrations
         run 'bundle exec rake railties:install:migrations FROM=spree_unified_payment'
