@@ -398,11 +398,11 @@ describe UnifiedPayment::Transaction do
       user.stub(:store_credits_total).and_return(100)
       @store_credit_balance = user.store_credits_total + @card_transaction.amount.to_f
       @store_credit = Object.new
-      @card_transaction.stub(:build_store_credit).with(:balance => @store_credit_balance, :user => user, :transactioner => user, :amount => @card_transaction.amount.to_f, :reason => "transferred from transaction:#{@card_transaction.payment_transaction_id}", :payment_mode => -1, :type => "Spree::Credit").and_return(@store_credit)
+      @card_transaction.stub(:build_store_credit).with(:balance => @store_credit_balance, :user => user, :transactioner => user, :amount => @card_transaction.amount.to_f, :reason => "transferred from transaction:#{@card_transaction.payment_transaction_id}", :payment_mode => Spree::Credit::PAYMENT_MODE['Payment Refund'], :type => "Spree::Credit").and_return(@store_credit)
       @store_credit.stub(:save!).and_return(true)
     end
 
-    it { @card_transaction.should_receive(:build_store_credit).with(:balance => @store_credit_balance, :user => user, :transactioner => user, :amount => @card_transaction.amount.to_f, :reason => "transferred from transaction:#{@card_transaction.payment_transaction_id}", :payment_mode => -1, :type => "Spree::Credit").and_return(@store_credit) }
+    it { @card_transaction.should_receive(:build_store_credit).with(:balance => @store_credit_balance, :user => user, :transactioner => user, :amount => @card_transaction.amount.to_f, :reason => "transferred from transaction:#{@card_transaction.payment_transaction_id}", :payment_mode => Spree::Credit::PAYMENT_MODE['Payment Refund'], :type => "Spree::Credit").and_return(@store_credit) }
     it { user.should_receive(:store_credits_total).and_return(100) }
     it { @store_credit.should_receive(:save!).and_return(true) }
     it { @card_transaction.should_not_receive(:associate_user) }

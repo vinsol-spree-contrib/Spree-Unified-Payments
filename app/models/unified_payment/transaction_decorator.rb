@@ -42,7 +42,7 @@ UnifiedPayment::Transaction.class_eval do
     #[TODO_CR] not sure why payment mode is -1
     #[MK] Please Refer https://github.com/vinsol/spree_wallet/blob/master/app/models/spree/credit.rb.
     #[TODO CR] We can also fetch -1 by using the constant instead of directly use -1.
-    store_credit = build_store_credit(:balance => store_credit_balance, :user => user, :transactioner => (transactioner || user), :amount => amount.to_f, :reason => "transferred from transaction:#{payment_transaction_id}", :payment_mode => -1, :type => "Spree::Credit")
+    store_credit = build_store_credit(:balance => store_credit_balance, :user => user, :transactioner => (transactioner || user), :amount => amount.to_f, :reason => "transferred from transaction:#{payment_transaction_id}", :payment_mode => Spree::Credit::PAYMENT_MODE['Payment Refund'], :type => "Spree::Credit")
     store_credit.save!
   end
 
