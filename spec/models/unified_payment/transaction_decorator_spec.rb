@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe UnifiedPayment::Transaction do
   
-  [:payment_transaction_id,:order_id, :gateway_order_status, :amount, :currency, :response_status, :pan, :response_description, :order_description, :xml_response, :status, :user_id].each do |attribute|
+  [:gateway_order_status, :amount, :currency, :response_status, :pan, :response_description, :order_description, :xml_response, :status].each do |attribute|
     it { should allow_mass_assignment_of attribute }
   end
 
