@@ -133,7 +133,7 @@ module Spree
       #[TODO_CR] Make required attributes protected and save them with without protection in the place where protection is not necessary.
       #[MK] Please look into this change. Could not find a good way to implement it without much hastle.
       gateway_transaction = UnifiedPayment::Transaction.where(:gateway_session_id => response_order['SessionID'], :gateway_order_id => response_order['OrderID'], :url => response_order['URL']).first
-      gateway_transaction.assign_attributes(:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending')
+      gateway_transaction.assign_attributes({:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending'}, :without_protection => true)
       gateway_transaction.save!
 
       @order.reserve_stock
