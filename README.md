@@ -7,7 +7,7 @@ Dependencies
 
 1) gem unified_payment
 ```ruby
-gem 'unified_payment', :git => "git@github.com:vinsol/Unified-Payments.git"
+gem 'unified_payment'
 ```
 2) delayed_job
 ```ruby
@@ -15,7 +15,7 @@ gem 'delayed_job_active_record'
 ```
 3) spree_wallet
 ```ruby
-gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
+gem 'spree_wallet'
 ```
 
 Set Up
@@ -23,7 +23,7 @@ Set Up
 
 Add To Gemfile:
 ```ruby
-gem 'spree_unified_payment', :git => "git@github.com:vinsol/Spree-Unified-Payments.git"
+gem 'spree_unified_payment'
 ```
 
 And run below command
@@ -34,15 +34,15 @@ Usage
 ---------
 Customer :
 
-Customer can pay via UnifiedPayment payment method at Checkout and can also see the list of UnifiedPayment Transactions initiated by them. 
+Customer can pay via Unified Payment payment method at Checkout and can also see the list of Unified Payment Transactions initiated by them.
 
 If a transaction is completed but the order fails to complete, the amount paid by the customer is added to the customer's account which he can use in future so that the user does not get stuck while making the payment.
 
 Admin :
 
-Admin can see the list of UnifiedPayment Transactions initiated by customers under admin section.
+Admin can see the list of Unified Payment Transactions initiated by customers under admin section.
 
-Admin can also ping UnifiedPayment gateway for an updated status of a transaction and the transaction is then updated accordingly.
+Admin can also ping Unified Payment gateway for an updated status of a transaction and the transaction is then updated accordingly.
 
 Testing
 ---------
