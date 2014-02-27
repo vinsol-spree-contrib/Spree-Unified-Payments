@@ -2,7 +2,7 @@
 
 <% content_for :table_filter do %>
   <div data-hook="admin_orders_index_search">
-    <%= form_for [:admin, @search], :url => unified_payments_path, :method => :get do |f| %>
+    <%= form_for [:admin, @search], :url => admin_unified_payments_path, :method => :get do |f| %>
       <div class="field-block alpha four columns">
         <div class="date-range-filter field">
           <%= label_tag nil, Spree.t(:date_range) %>
