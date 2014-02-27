@@ -4,7 +4,9 @@ Gem::Specification.new do |s|
   s.version = "1.0.0"
   s.author = "Manish Kangia"
   s.email     = 'info@vinsol.com'
-  s.homepage  = 'http://vinsol.com' 
+  s.homepage  = 'http://vinsol.com'
+  s.license   = 'MIT' 
+ 
 
   s.summary = "Integrate payment using UnifiedPayment service"
   s.description = "Enable spree store to allow payment via UnifiedPayment"
