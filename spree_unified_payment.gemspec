@@ -1,14 +1,13 @@
 Gem::Specification.new do |s|
-  s.platform    = Gem::Platform::RUBY
-  s.name = "spree_unified_payment"
-  s.version = "1.0.0"
-  s.author = "Manish Kangia"
+  s.platform  = Gem::Platform::RUBY
+  s.name      = "spree_unified_payment"
+  s.version   = "1.0.0"
+  s.author    = ["Manish Kangia", "Sushant Mittal"
   s.email     = 'info@vinsol.com'
   s.homepage  = 'http://vinsol.com'
   s.license   = 'MIT' 
- 
 
-  s.summary = "Integrate payment using UnifiedPayment service"
+  s.summary     = "Integrate payment using UnifiedPayment service"
   s.description = "Enable spree store to allow payment via UnifiedPayment"
 
   s.required_rubygems_version = ">=2.0.0"
