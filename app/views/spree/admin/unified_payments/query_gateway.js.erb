@@ -6,5 +6,5 @@
   $('#<%= @card_transaction.payment_transaction_id %> .gateway_order_status').text('<%= @card_transaction.gateway_order_status %>')
 <% else %>
   alert('Could not wallet the money. Got order status <%= @card_transaction.gateway_order_status %>');
-  $('#<%= @card_transaction.payment_transaction_id %> .gateway_order_status').text('<%= @@card_transaction.gateway_order_status %>')
+  $('#<%= @card_transaction.payment_transaction_id %> .gateway_order_status').text('<%= @card_transaction.gateway_order_status %>')
 <% end %>

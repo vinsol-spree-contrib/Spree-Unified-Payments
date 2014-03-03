@@ -30,7 +30,7 @@ $(document).ready(function() {
     return self;
   }  
   
-  $('#reveal_xml').click(function() {
+  $('.reveal_xml').click(function() {
     ct_id = $(this).attr('data-ct-id');
     var quick_view = new ModalPopUp($("<div></div>").attr('id', 'quick_view_popup').html($("#xml_response_" + ct_id).clone()));
     $('#quick_view_popup .xml_response').removeClass('hidden');

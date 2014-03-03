@@ -49,7 +49,7 @@ module Spree
  
       @payment_made = @gateway_message_hash['PurchaseAmountScr'].to_f
       if @card_transaction.approved_at_gateway?
-        if @card_transaction.amount != @payment_made
+        if @card_transaction.amount.to_f != @payment_made
           process_unsuccessful_transaction
         else
           process_successful_transaction
