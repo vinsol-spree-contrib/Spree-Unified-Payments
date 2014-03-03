@@ -141,8 +141,8 @@ describe Spree::UnifiedPaymentsController do
       before do
         session[:transaction_id] = '12345678910121'
         @gateway_response = Object.new
-        UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(@gateway_response)
-        UnifiedPayment::Transaction.stub(:extract_url_for_unified_payment).with(@gateway_response).and_return('www.MyTestSite.com')
+        UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from #{Spree::Config[:site_name]}"}).and_return(@gateway_response)
+        UnifiedPayment::Transaction.stub(:extract_url_for_unified_payment).with(@gateway_response).and_return("www.#{Spree::Config[:site_name]}.com")
         controller.stub(:tasks_on_gateway_create_response).with(@gateway_response, '12345678910121').and_return(true)
       end
 
@@ -174,8 +174,8 @@ describe Spree::UnifiedPaymentsController do
       context 'when an order is successfully created at gateway' do
         
         describe 'method calls' do
-          it { UnifiedPayment::Transaction.should_receive(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(@gateway_response) }
-          it { UnifiedPayment::Transaction.should_receive(:extract_url_for_unified_payment).with(@gateway_response).and_return('www.MyTestSite.com') }
+          it { UnifiedPayment::Transaction.should_receive(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from #{Spree::Config[:site_name]}"}).and_return(@gateway_response) }
+          it { UnifiedPayment::Transaction.should_receive(:extract_url_for_unified_payment).with(@gateway_response).and_return("www.#{Spree::Config[:site_name]}.com") }
           it { controller.should_receive(:tasks_on_gateway_create_response).with(@gateway_response, '12345678910121').and_return(true) }
           
           after { send_request }
@@ -184,17 +184,17 @@ describe Spree::UnifiedPaymentsController do
         describe 'assigns' do
           it 'payment_url' do
             send_request
-            assigns(:payment_url).should eq("www.MyTestSite.com")
+            assigns(:payment_url).should eq("www.#{Spree::Config[:site_name]}.com")
           end
         end
       end
 
       context 'when order not created at gateway' do
         
-        before { UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(false) }
+        before { UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from #{Spree::Config[:site_name]}"}).and_return(false) }
         
         describe 'method calls' do
-          it { UnifiedPayment::Transaction.should_receive(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(false) }
+          it { UnifiedPayment::Transaction.should_receive(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from #{Spree::Config[:site_name]}"}).and_return(false) }
           it { UnifiedPayment::Transaction.should_not_receive(:extract_url_for_unified_payment) }
           it { controller.should_not_receive(:tasks_on_gateway_create_response) }
           
@@ -218,7 +218,7 @@ describe Spree::UnifiedPaymentsController do
             before { send_request }
 
             it { flash[:error].should be_nil }
-            it { response.body.should eq("$('#confirm_payment').hide();top.location.href = 'www.MyTestSite.com'") }
+            it { response.body.should eq("$('#confirm_payment').hide();top.location.href = 'www.#{Spree::Config[:site_name]}.com'") }
           end
         end
       end
@@ -235,8 +235,8 @@ describe Spree::UnifiedPaymentsController do
         order.stub(:next).and_return(true)
         @gateway_response = {'Status' => 'status', 'Order' => { 'SessionID' => '12312', 'OrderID' => '123121', 'URL' => 'MyResponse'}}
         @transaction = UnifiedPayment::Transaction.new
-        UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from MyTestSite"}).and_return(@gateway_response)
-        UnifiedPayment::Transaction.stub(:extract_url_for_unified_payment).with(@gateway_response).and_return('www.MyTestSite.com')
+        UnifiedPayment::Transaction.stub(:create_order_at_unified).with(order.total, {:approve_url=>"http://test.host/unified_payments/approved", :cancel_url=>"http://test.host/unified_payments/canceled", :decline_url=>"http://test.host/unified_payments/declined", :description=>"Purchasing items from #{Spree::Config[:site_name]}"}).and_return(@gateway_response)
+        UnifiedPayment::Transaction.stub(:extract_url_for_unified_payment).with(@gateway_response).and_return("www.#{Spree::Config[:site_name]}.com")
         UnifiedPayment::Transaction.stub(:where).with(:gateway_session_id => '12312', :gateway_order_id => '123121', :url => 'MyResponse').and_return([@transaction])
         @transaction.stub(:save!).and_return(true)
       end
