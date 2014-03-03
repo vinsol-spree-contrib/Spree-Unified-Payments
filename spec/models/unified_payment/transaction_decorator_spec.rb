@@ -333,7 +333,7 @@ describe UnifiedPayment::Transaction do
 
     it 'assigns expired_at' do
       @card_transaction.abort!
-      @card_transaction.reload.expired_at.should eq(@time_now.to_s)
+      @card_transaction.reload.expired_at.should eq(@time_now)
     end
   end
 
