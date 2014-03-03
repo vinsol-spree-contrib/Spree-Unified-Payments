@@ -320,8 +320,8 @@ describe UnifiedPayment::Transaction do
 
   describe 'abort!' do
     before do
-      @time_now = Time.now
-      Time.stub(:now).and_return(@time_now)
+      @time_now = DateTime.strptime('2012-03-03', '%Y-%m-%d')
+      Time.stub(:current).and_return(@time_now)
       @card_transaction = UnifiedPayment::Transaction.new(:status => 'somestatus', :payment_transaction_id => '1234')
       @card_transaction.stub(:release_order_inventory).and_return(true)
     end
@@ -333,7 +333,7 @@ describe UnifiedPayment::Transaction do
 
     it 'assigns expired_at' do
       @card_transaction.abort!
-      @card_transaction.reload.expired_at.should eq(@time_now)
+      @card_transaction.reload.expired_at.should eq(@time_now.to_s)
     end
   end
 
