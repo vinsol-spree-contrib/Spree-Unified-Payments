@@ -21,6 +21,7 @@ require 'database_cleaner'
 UnifiedPayment::Transaction.class_eval do
   attr_accessible :payment_transaction_id
 end
+Spree::Config[:site_name] = "MyTestSite"
 
 RSpec.configure do |config|
   # ## Mock Framework

@@ -9,7 +9,6 @@ describe Spree::UnifiedPaymentsController do
   before(:each) do
     user.stub(:generate_spree_api_key!).and_return(true)
     user.stub(:last_incomplete_spree_order).and_return(order)
-    Spree::Config[:site_name] = "MyTestSite"
     controller.stub(:spree_current_user).and_return(user)
     controller.stub(:current_order).and_return(order)
   end
