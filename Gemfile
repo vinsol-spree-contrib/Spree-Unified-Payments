@@ -8,7 +8,7 @@ gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.3'
 gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
 gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: '2-0-stable'
 
-gem 'unified_payment', :git => "git@github.com:vinsol/Unified-Payments.git", :branch => 'master', :ref => 'd073d87e425609975ba4580323260c1fcc83ab86'
+gem 'unified_payment', :tag => 'v1.0.1'
 gem 'delayed_job_active_record', :tag => 'v4.0.0'
 
 group :test do
