@@ -1,4 +1,4 @@
-Spree-Unified-Payments [![Code Climate](https://codeclimate.com/github/vinsol/Spree-Unified-Payments.png)](https://codeclimate.com/github/vinsol/Spree-Unified-Payments)
+Spree-Unified-Payments [![Code Climate](https://codeclimate.com/github/vinsol/Spree-Unified-Payments.png)](https://codeclimate.com/github/vinsol/Spree-Unified-Payments) [![Build Status](https://travis-ci.org/vinsol/Spree-Unified-Payments.png?branch=master)](https://travis-ci.org/vinsol/Spree-Unified-Payments)
 ================
 Enable spree store to allow payment via UnifiedPayment
 
