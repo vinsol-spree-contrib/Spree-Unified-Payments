@@ -4,7 +4,7 @@ gem 'mysql2'
 gem 'sqlite3'
 
 
-gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.9'
+gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.8'
 gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
 gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: '2-0-stable'
 

@@ -4,7 +4,7 @@ describe Spree::CheckoutController do
   let(:user) { mock_model(Spree.user_class) }
   let(:role) { mock_model(Spree::Role) }
   let(:roles) { [role] }
-  let(:order) { mock_model(Spree::Order) }
+  let(:order) { Spree::Order.new }
   let(:payment) { mock_model(Spree::Payment) }
   let(:variant) { mock_model(Spree::Variant, :name => 'test-variant') }
 
@@ -18,7 +18,6 @@ describe Spree::CheckoutController do
     role.stub(:ability).and_return(true)
     user.stub(:last_incomplete_spree_order).and_return(nil)
     controller.stub(:load_order).and_return(true)
-
     controller.stub(:ensure_order_not_completed).and_return(true)
     controller.stub(:ensure_checkout_allowed).and_return(true)
     controller.stub(:ensure_sufficient_stock_lines).and_return(true)
@@ -36,6 +35,10 @@ describe Spree::CheckoutController do
     order.stub(:update_attributes).with('object_params').and_return(false)
     @payments = [payment]
     @payments.stub(:reload).and_return(true)
+    @payments.stub(:completed).and_return([])
+    @payments.stub(:valid).and_return([])
+    @payment_method = mock_model(Spree::PaymentMethod, :type => 'Spree::PaymentMethod::UnifiedPaymentMethod')
+    payment.stub(:payment_method).and_return(@payment_method)
     order.stub(:payments).and_return(@payments)
     order.stub(:next).and_return(true)
     order.stub(:completed?).and_return(false)
@@ -49,7 +52,6 @@ describe Spree::CheckoutController do
 
     context 'if payment state' do
       before do
-        @payment_method = mock_model(Spree::PaymentMethod, :type => 'Spree::PaymentMethod::UnifiedPaymentMethod')
         @payment_method.stub(:is_a?).with(Spree::PaymentMethod::UnifiedPaymentMethod).and_return(true)
       end
 
