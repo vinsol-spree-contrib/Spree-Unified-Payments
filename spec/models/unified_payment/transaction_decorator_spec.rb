@@ -28,7 +28,7 @@ describe UnifiedPayment::Transaction do
     context 'after and before save' do
       context 'pending transaction on creation' do
         before do
-          @pending_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
+          @pending_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
         end
 
         it { @pending_card_transaction.should_not_receive(:notify_user_on_transaction_status) }
@@ -45,7 +45,7 @@ describe UnifiedPayment::Transaction do
 
       context 'pending to successful transaction' do
         before do
-          @successful_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
+          @successful_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
           @successful_card_transaction.save!
           @successful_card_transaction.status = 'successful'
         end
@@ -95,7 +95,7 @@ describe UnifiedPayment::Transaction do
 
       context 'pending to unsuccessful transaction' do
         before do
-          @unsuccessful_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
+          @unsuccessful_card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
           @unsuccessful_card_transaction.save!
           @unsuccessful_card_transaction.status = 'unsuccessful'
         end
@@ -120,8 +120,8 @@ describe UnifiedPayment::Transaction do
 
       context 'expire transaction' do
         before do
-          @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234')
-          @expired_card_transaction = UnifiedPayment::Transaction.create!(:status => 'unsuccessful', :payment_transaction_id => '1234')
+          @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
+          @expired_card_transaction = UnifiedPayment::Transaction.create!(:status => 'unsuccessful', :payment_transaction_id => '1234', :amount => 100)
           @expired_card_transaction.expired_at = Time.current
           @expired_card_transaction.save!
         end
@@ -147,8 +147,8 @@ describe UnifiedPayment::Transaction do
   context 'scopes' do
     describe 'pending' do
       before do
-        @successful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'successful', :payment_transaction_id => '1234')
-        @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234')
+        @successful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'successful', :payment_transaction_id => '1234', :amount => 100)
+        @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
       end
 
       it { UnifiedPayment::Transaction.pending.should eq([@pending_card_transaction]) }
@@ -169,12 +169,12 @@ describe UnifiedPayment::Transaction do
   describe '#assign_attributes_using_xml' do
     before do
       UnifiedPayment::Transaction.any_instance.unstub(:assign_attributes_using_xml)
-      @card_transaction_with_message = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123321')
+      @card_transaction_with_message = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123321', :amount => 100)
       @xml_response = '<Message><PAN>123XXX123</PAN><PurchaseAmountScr>200</PurchaseAmountScr><Currency>NGN</Currency><ResponseDescription>TestDescription</ResponseDescription><OrderStatus>OnTest</OrderStatus><OrderDescription>TestOrder</OrderDescription><Status>00</Status><MerchantTranID>12345654321</MerchantTranID><ApprovalCode>123ABC</ApprovalCode></Message>'
       @card_transaction_with_message.stub(:xml_response).and_return(@xml_response)
       @gateway_transaction = UnifiedPayment::Transaction.new
       @card_transaction_with_message.stub(:gateway_transaction).and_return(@gateway_transaction)
-      @card_transaction_without_message = UnifiedPayment::Transaction.new()
+      @card_transaction_without_message = UnifiedPayment::Transaction.new
     end
 
     describe 'method calls' do
@@ -201,7 +201,7 @@ describe UnifiedPayment::Transaction do
   describe '#notify_user_on_transaction_status' do
     before do
       UnifiedPayment::Transaction.any_instance.unstub(:notify_user_on_transaction_status)
-      @card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234')
+      @card_transaction = UnifiedPayment::Transaction.new(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
       @mailer_object = Object.new
       @mailer_object.stub(:deliver!).and_return(true)
       Spree::TransactionNotificationMailer.stub(:delay).and_return(Spree::TransactionNotificationMailer)
@@ -230,12 +230,13 @@ describe UnifiedPayment::Transaction do
   describe '#complete_order' do
     before do
       UnifiedPayment::Transaction.any_instance.unstub(:complete_order)
-      @card_transaction = UnifiedPayment::Transaction.new(:status => 'successful', :payment_transaction_id => '1234')
+      @card_transaction = UnifiedPayment::Transaction.new(:status => 'successful', :payment_transaction_id => '1234', :amount => '100')
       @card_transaction.stub(:order).and_return(order)
       order.stub(:next!).and_return(true)
       @payment = mock_model(Spree::Payment)
       @payment.stub(:complete).and_return(true)
       order.stub(:pending_payments).and_return([@payment])
+      order.stub(:total).and_return(100)
     end
 
     it { order.should_receive(:next!).and_return(true) }
@@ -250,7 +251,7 @@ describe UnifiedPayment::Transaction do
   describe '#cancel_order' do
     before do
       UnifiedPayment::Transaction.any_instance.unstub(:cancel_order)
-      @card_transaction = UnifiedPayment::Transaction.new(:status => 'unsuccessful', :payment_transaction_id => '1234')
+      @card_transaction = UnifiedPayment::Transaction.new(:status => 'unsuccessful', :payment_transaction_id => '1234', :amount => 100)
       @card_transaction.stub(:order).and_return(order)
       order.stub(:release_inventory).and_return(true)
       @payment = mock_model(Spree::Payment)
@@ -322,7 +323,7 @@ describe UnifiedPayment::Transaction do
     before do
       @time_now = DateTime.strptime('2012-03-03', '%Y-%m-%d')
       Time.stub(:current).and_return(@time_now)
-      @card_transaction = UnifiedPayment::Transaction.new(:status => 'somestatus', :payment_transaction_id => '1234')
+      @card_transaction = UnifiedPayment::Transaction.new(:status => 'somestatus', :payment_transaction_id => '1234', :amount => 100)
       @card_transaction.stub(:release_order_inventory).and_return(true)
     end
 
@@ -339,9 +340,9 @@ describe UnifiedPayment::Transaction do
 
   describe 'status checks for pening, unsuccessful and successful' do
     before do
-      @successful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'successful', :payment_transaction_id => '1234')
-      @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234')
-      @unsuccessful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'unsuccessful', :payment_transaction_id => '1234')
+      @successful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'successful', :payment_transaction_id => '1234', :amount => 100)
+      @pending_card_transaction = UnifiedPayment::Transaction.create!(:status => 'pending', :payment_transaction_id => '1234', :amount => 100)
+      @unsuccessful_card_transaction = UnifiedPayment::Transaction.create!(:status => 'unsuccessful', :payment_transaction_id => '1234', :amount => 100)
     end
 
     it { @successful_card_transaction.pending?.should be_false }
@@ -420,7 +421,7 @@ describe UnifiedPayment::Transaction do
 
   describe '#associate_user' do
     before do
-      @card_transaction = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123454321')
+      @card_transaction = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123454321', :amount => 100)
       @card_transaction.stub(:order).and_return(order)
       order.stub(:email).and_return('test_user@baloo.com')
       @card_transaction.stub(:save!).and_return(true)
@@ -466,7 +467,7 @@ describe UnifiedPayment::Transaction do
   end
 
   describe '#update_transaction_on_query' do
-    before { @card_transaction = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123454321') }
+    before { @card_transaction = UnifiedPayment::Transaction.create!(:payment_transaction_id => '123454321', :amount => 100) }
     
     context 'status is APPROVED' do
       it { @card_transaction.should_receive(:assign_attributes).with(:gateway_order_status => 'APPROVED', :status => 'successful').and_return(true) }
