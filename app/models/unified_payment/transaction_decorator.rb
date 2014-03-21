@@ -15,7 +15,7 @@ UnifiedPayment::Transaction.class_eval do
   after_save :release_order_inventory, :if => [:expired_at?, "expired_at_was == nil"]
 
   def payment_valid_for_order?
-    !order.completed? && order.total == amount
+    !order.completed? && order.total == Float(amount)
   end
 
   def order_inventory_released?
@@ -83,7 +83,7 @@ UnifiedPayment::Transaction.class_eval do
   end
 
   def complete_order
-    if order.total == amount
+    if order.total == Float(amount)
       order.next!
       order.pending_payments.first.complete
     end
