@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  s.add_dependency('spree_core', '~> 2.1.0')
+  s.add_dependency('spree_core', '~> 2.2.0')
   s.add_dependency 'unified_payment', '1.0.1'
   #TODO: add this back once spree_wallet is ready
   # s.add_dependency 'spree_wallet', '~> 2.0.3'

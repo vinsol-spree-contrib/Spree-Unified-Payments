@@ -18,6 +18,7 @@ describe Spree::CheckoutController do
     role.stub(:ability).and_return(true)
     user.stub(:last_incomplete_spree_order).and_return(nil)
     controller.stub(:load_order).and_return(true)
+    controller.stub(:load_order_with_lock).and_return(true)
     controller.stub(:ensure_order_not_completed).and_return(true)
     controller.stub(:ensure_checkout_allowed).and_return(true)
     controller.stub(:ensure_sufficient_stock_lines).and_return(true)
@@ -79,7 +80,7 @@ describe Spree::CheckoutController do
         end
 
         describe 'method calls' do
-          it { order.should_receive(:update_attributes).with('object_params').exactly(1).times.and_return(true) }
+          it { order.should_receive(:update_attributes).with({}).exactly(1).times.and_return(true) }
           it { Spree::PaymentMethod.should_receive(:where).with(:id => nil).and_return([]) }
           after do
             send_request({"state" => "payment"})
@@ -95,7 +96,7 @@ describe Spree::CheckoutController do
 
         describe 'method calls' do
           it { order.should_not_receive(:update) }
-          it { order.should_receive(:update_attributes).with('object_params').exactly(1).times.and_return(true) }
+          it { order.should_receive(:update_attributes).with({"payments_attributes"=>[{}]}).exactly(1).times.and_return(true) }
           it { Spree::PaymentMethod.should_receive(:where).with(:id => nil).and_return([]) }
           after do
             send_request({"order"=>{"payments_attributes"=>[{}]}, "state"=>"payment"})
