@@ -1,6 +1,4 @@
 UnifiedPayment::Transaction.class_eval do    
-  attr_accessible :status
-
   belongs_to :order, :class_name => "Spree::Order"
   belongs_to :user, :class_name => "Spree::User"
   has_one :store_credit, :class_name => "Spree::StoreCredit"

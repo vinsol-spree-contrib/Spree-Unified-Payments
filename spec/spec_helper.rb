@@ -17,11 +17,6 @@ require 'database_cleaner'
 # If you are not using ActiveRecord, you can remove this line.
 # ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
-#Allow attr_access for test environment
-UnifiedPayment::Transaction.class_eval do
-  attr_accessible :payment_transaction_id
-end
-
 RSpec.configure do |config|
   # ## Mock Framework
   #
