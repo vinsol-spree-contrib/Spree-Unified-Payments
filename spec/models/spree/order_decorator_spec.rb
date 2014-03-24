@@ -131,7 +131,7 @@ describe Spree::Order do
       @order_updater.stub(:update_payment_state).and_return(true)
       @order_updater.stub(:run_hooks).and_return(true)
       @state_changes = []
-      @state_changes.stub(:create).with({:previous_state=>'confirm', :next_state=>"complete", :name=>"order", :user_id=>user.id}, {:without_protection=>true}).and_return(true)
+      @state_changes.stub(:create).with({:previous_state=>'confirm', :next_state=>"complete", :name=>"order", :user_id=>user.id}).and_return(true)
       
       @order.stub(:state_changes).and_return(@state_changes)
       @order.stub(:previous_states).and_return([:delivery, :payment, :confirm])
@@ -176,7 +176,7 @@ describe Spree::Order do
     end
 
     it 'stores state changes' do
-      @state_changes.should_receive(:create).with({:previous_state=>'confirm', :next_state=>"complete", :name=>"order", :user_id=>user.id}, {:without_protection=>true}).and_return(true)
+      @state_changes.should_receive(:create).with({:previous_state=>'confirm', :next_state=>"complete", :name=>"order", :user_id=>user.id}).and_return(true)
       @order.finalize!
     end
 
@@ -194,7 +194,7 @@ describe Spree::Order do
     context 'when orders last state was not confirm' do
       before do
         @order.stub(:previous_states).and_return([:delivery, :payment])
-        @state_changes.stub(:create).with({:previous_state=>"payment", :next_state=>"complete", :name=>"order", :user_id=>user.id}, {:without_protection=>true}).and_return(true)
+        @state_changes.stub(:create).with({:previous_state=>"payment", :next_state=>"complete", :name=>"order", :user_id=>user.id}).and_return(true)
       end
 
       it 'reserves stock' do

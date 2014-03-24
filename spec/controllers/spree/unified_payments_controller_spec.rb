@@ -254,7 +254,7 @@ describe Spree::UnifiedPaymentsController do
           it { order.should_receive(:reserve_stock).and_return(true) }
           it { order.should_not_receive(:next) }
           it { UnifiedPayment::Transaction.should_receive(:where).with(:gateway_session_id => '12312', :gateway_order_id => '123121', :url => 'MyResponse').and_return([@transaction]) }
-          it { @transaction.should_receive(:assign_attributes).with({:user_id => order.user.try(:id), :payment_transaction_id => '12345678910121', :order_id => order.id, :gateway_order_status => 'CREATED', :amount => order.total, :currency => Spree::Config[:currency], :response_status => 'status', :status => 'pending'}, :without_protection => true).and_return(true) }
+          it { @transaction.should_receive(:assign_attributes).with({:user_id => order.user.try(:id), :payment_transaction_id => '12345678910121', :order_id => order.id, :gateway_order_status => 'CREATED', :amount => order.total, :currency => Spree::Config[:currency], :response_status => 'status', :status => 'pending'}).and_return(true) }
           it { @transaction.should_receive(:save!).and_return(true) }
           after { send_request }
         end
@@ -295,11 +295,6 @@ describe Spree::UnifiedPaymentsController do
           it { @card_transaction.should_receive(:save).with(:validate => false).and_return(true) } 
           
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><ResponseDescription>Reason</ResponseDescription></Message>'}) }
-        end
-
-        it 'renders without layout' do
-          send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><ResponseDescription>Reason</ResponseDescription></Message>'})
-          response.should render_template(:declined, :layout => false)
         end
       end
     end
@@ -366,11 +361,6 @@ describe Spree::UnifiedPaymentsController do
           it { controller.should_not_receive(:verify_authenticity_token) }
 
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash></Message>'}) }
-        end
-
-        it 'renders without layout' do
-          send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash></Message>'})
-          response.should render_template(:canceled, :layout => false)
         end
       end
     end
@@ -496,11 +486,6 @@ describe Spree::UnifiedPaymentsController do
           it { order.should_not_receive(:completed?) }
           
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><PurchaseAmountScr>200</PurchaseAmountScr></Message>'}) }
-        end
-
-        it 'renders without layout' do
-          send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><PurchaseAmountScr>200</PurchaseAmountScr></Message>'})
-          response.should render_template(:approved, :layout => false)
         end
       end
     end
