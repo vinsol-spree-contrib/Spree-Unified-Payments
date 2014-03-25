@@ -276,6 +276,8 @@ describe Spree::UnifiedPaymentsController do
       UnifiedPayment::Transaction.stub_chain(:where, :first).and_return(@card_transaction)
     end
 
+    #TODO -> Why rspec for rendering template removed from declined, canceled and approved actions testing ?
+
     context 'as declined' do
       describe '#declined' do
         
@@ -295,7 +297,7 @@ describe Spree::UnifiedPaymentsController do
           it { @card_transaction.should_receive(:save).with(:validate => false).and_return(true) } 
           
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><ResponseDescription>Reason</ResponseDescription></Message>'}) }
-        end
+        end 
       end
     end
 
