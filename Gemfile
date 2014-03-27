@@ -3,11 +3,11 @@ gem 'rails', '4.0.3'
 gem 'mysql2'
 gem 'sqlite3'
 
-
+gem 'coffee-script'
 gem 'spree', :git => 'https://github.com/spree/spree.git', :tag => 'v2.2.0'
 
 # Provides basic authentication functionality for testing parts of your engine
-gem 'spree_auth_devise', github: 'radar/spree_auth_devise', :branch => '2-2-stable'
+gem 'spree_auth_devise', github: 'spree/spree_auth_devise', :branch => '2-2-stable'
 
 gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
 
