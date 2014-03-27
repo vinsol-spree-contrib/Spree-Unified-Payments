@@ -64,4 +64,8 @@ Spree::Order.class_eval do
       end
     end
   end
+
+  def total_eql?(amount)
+    total == Float(amount)
+  end
 end

@@ -9,7 +9,7 @@ gem 'spree', :git => 'https://github.com/spree/spree.git', :tag => 'v2.1.4'
 # Provides basic authentication functionality for testing parts of your engine
 gem 'spree_auth_devise', github: 'spree/spree_auth_devise', :branch => '2-1-stable'
 
-gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
+gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git', tag: '2.1.0'
 
 gem 'unified_payment', github: 'vinsol/Unified-Payments', branch: 'upgrade_rails4'
 

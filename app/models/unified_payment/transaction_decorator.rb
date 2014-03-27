@@ -15,7 +15,7 @@ UnifiedPayment::Transaction.class_eval do
   #TODO -> We can create separate method for checking whether order's total is same as transaction amount or not.
 
   def payment_valid_for_order?
-    !order.completed? && order.total == Float(amount)
+    !order.completed? && order.total_eql?(amount)
   end
 
   def order_inventory_released?
@@ -83,7 +83,7 @@ UnifiedPayment::Transaction.class_eval do
   end
 
   def complete_order
-    if order.total == Float(amount)
+    if order.total_eql?(amount)
       order.next!
       order.pending_payments.first.complete
     end

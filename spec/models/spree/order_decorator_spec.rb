@@ -203,4 +203,13 @@ describe Spree::Order do
       end
     end
   end
+
+  describe '#total_eql?' do
+    before do
+      @order.stub(:total).and_return(100)
+    end
+
+    it { @order.should be_total_eql('100') }
+    it { @order.should_not be_total_eql('50') }
+  end
 end

@@ -5,7 +5,7 @@ describe UnifiedPayment::Transaction do
   it { should belong_to(:order).class_name('Spree::Order') }
 
   it { should have_one(:store_credit).class_name('Spree::StoreCredit') }
-  let(:order) { mock_model(Spree::Order) }
+  let(:order) { Spree::Order.create! }
   let(:user) { mock_model(Spree::User) }
 
   before do
