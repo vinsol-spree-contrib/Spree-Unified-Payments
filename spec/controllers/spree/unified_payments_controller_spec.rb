@@ -297,7 +297,12 @@ describe Spree::UnifiedPaymentsController do
           it { @card_transaction.should_receive(:save).with(:validate => false).and_return(true) } 
           
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><ResponseDescription>Reason</ResponseDescription></Message>'}) }
-        end 
+        end
+
+        it 'renders declined template' do
+          send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><ResponseDescription>Reason</ResponseDescription></Message>'})
+          response.should render_template(:declined)
+        end
       end
     end
 
@@ -363,6 +368,11 @@ describe Spree::UnifiedPaymentsController do
           it { controller.should_not_receive(:verify_authenticity_token) }
 
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash></Message>'}) }
+        end
+
+        it 'renders canceled template' do
+          send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash></Message>'})
+          response.should render_template(:canceled)
         end
       end
     end
@@ -488,6 +498,11 @@ describe Spree::UnifiedPaymentsController do
           it { order.should_not_receive(:completed?) }
           
           after { send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><PurchaseAmountScr>200</PurchaseAmountScr></Message>'}) }
+        end
+
+        it 'renders without layout' do
+          send_request({:xmlmsg => '<Message><Hash>Mymessage</Hash><PurchaseAmountScr>200</PurchaseAmountScr></Message>'})
+          response.should render_template(:approved)
         end
       end
     end
