@@ -12,8 +12,6 @@ UnifiedPayment::Transaction.class_eval do
   after_save :cancel_order, :if => [:status_changed?, :unsuccessful?]
   after_save :release_order_inventory, :if => [:expired_at?, "expired_at_was == nil"]
 
-  #TODO -> We can create separate method for checking whether order's total is same as transaction amount or not.
-
   def payment_valid_for_order?
     !order.completed? && order.total_eql?(amount)
   end
