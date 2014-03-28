@@ -33,7 +33,7 @@ describe Spree::CheckoutController do
     order.stub(:has_checkout_step?).with('payment').and_return(true)
     order.stub(:payment?).and_return(false)
     order.stub(:update_attributes).and_return(false)
-    order.stub(:update_attributes).with('object_params').and_return(false)
+    order.stub(:update_attributes).with({"payments_attributes"=>[{"payment_method_id"=>"1"}]}).and_return(false)
     @payments = [payment]
     @payments.stub(:reload).and_return(true)
     @payments.stub(:completed).and_return([])
@@ -60,7 +60,7 @@ describe Spree::CheckoutController do
         before { Spree::PaymentMethod.stub(:where).with(:id => '1').and_return([@payment_method]) }
 
         describe 'method calls' do
-          it { order.should_receive(:update_attributes).with('object_params').and_return(false) }
+          it { order.should_receive(:update_attributes).with({"payments_attributes"=>[{"payment_method_id"=>"1"}]}).and_return(false) }
           it { @payment_method.should_receive(:is_a?).with(Spree::PaymentMethod::UnifiedPaymentMethod).and_return(true) }
           it { Spree::PaymentMethod.should_receive(:where).with(:id => '1').and_return([@payment_method]) }
           it { order.should_not_receive(:update) }
