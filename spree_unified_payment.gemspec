@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.requirements << 'none'
 
   s.add_dependency('spree_core', '~> 2.1.0')
-  s.add_dependency 'unified_payment', '1.0.2'
+  s.add_dependency 'unified_payment', '1.1.0'
   s.add_dependency 'spree_wallet', '~> 2.1.0'
   s.add_dependency 'delayed_job_active_record', '~> 4.0.0'
 end
