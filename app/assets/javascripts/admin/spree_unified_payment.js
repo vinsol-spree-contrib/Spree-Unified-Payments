@@ -14,7 +14,7 @@ $(document).ready(function() {
           autoOpen: false,
           modal: true,
           width:700,
-          closeText: "X",
+          closeText: "",
           dialogClass:"quick_view_container",
           close: function(event, ui) {
             pop_up_div.remove();
