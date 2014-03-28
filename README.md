@@ -22,10 +22,16 @@ Set Up
 ================
 
 Add To Gemfile:
+
+For Spree 2.2.x
+```ruby
+gem 'spree_unified_payment', '1.2.0'
+```
+For Spree 2.1.x
 ```ruby
 gem 'spree_unified_payment', '1.1.0'
 ```
-For Spree 2.0:
+For Spree 2.0.x:
 ```ruby
 gem 'spree_unified_payment', '1.0.2'
 ```
