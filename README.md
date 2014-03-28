@@ -23,7 +23,11 @@ Set Up
 
 Add To Gemfile:
 ```ruby
-gem 'spree_unified_payment'
+gem 'spree_unified_payment', '1.1.0'
+```
+For Spree 2.0:
+```ruby
+gem 'spree_unified_payment', '1.0.2'
 ```
 
 And run below command
