@@ -1,3 +1,4 @@
+//= require jquery.ui.dialog.js
 $(document).ready(function() {
   click_on_overlay = function(pop_up_div) {
     $('div.ui-widget-overlay').on('click', function(){
