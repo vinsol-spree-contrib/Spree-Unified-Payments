@@ -11,7 +11,7 @@ gem 'spree_auth_devise', github: 'spree/spree_auth_devise', :branch => '2-2-stab
 
 gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git', branch: 'master', ref: 'e963563a45af410a20b863f6792b5da0613961dc'
 
-gem 'unified_payment', github: 'vinsol/Unified-Payments', branch: 'upgrade_rails4'
+gem 'unified_payment', github: 'vinsol/Unified-Payments', tag: '1.1.0'
 
 gem 'delayed_job_active_record', :tag => 'v4.0.0'
 

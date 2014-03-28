@@ -12,7 +12,7 @@ Spree::CheckoutController.class_eval do
     payment_method = Spree::PaymentMethod.where(:id => payment_method_id).first
 
     if payment_method.is_a?(Spree::PaymentMethod::UnifiedPaymentMethod)
-      @order.update_attributes(object_params)
+      @order.update_from_params(params, permitted_checkout_attributes)
       redirect_to new_unified_transaction_path
     end
   end
