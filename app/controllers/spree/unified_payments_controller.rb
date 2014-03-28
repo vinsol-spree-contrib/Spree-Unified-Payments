@@ -22,8 +22,6 @@ module Spree
     end
 
     def create
-      # We also can extract these options is a method.
-      #[MK] it was decided not giving any options since we want the requested to be redirected defined methods only
       response = UnifiedPayment::Transaction.create_order_at_unified(@order.total, { :approve_url => approved_unified_payments_url, :cancel_url => canceled_unified_payments_url, :decline_url => declined_unified_payments_url, :description => "Purchasing items from #{Spree::Config[:site_name]}" })
       if response
         @payment_url = UnifiedPayment::Transaction.extract_url_for_unified_payment(response)
@@ -131,7 +129,7 @@ module Spree
       response_order = response['Order']
       
       gateway_transaction = UnifiedPayment::Transaction.where(:gateway_session_id => response_order['SessionID'], :gateway_order_id => response_order['OrderID'], :url => response_order['URL']).first
-      gateway_transaction.assign_attributes({:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending'}, :without_protection => true)
+      gateway_transaction.assign_attributes(:user_id => @order.user.try(:id), :payment_transaction_id => transaction_id, :order_id => @order.id, :gateway_order_status => 'CREATED', :amount => @order.total, :currency => Spree::Config[:currency], :response_status => response["Status"], :status => 'pending')
       gateway_transaction.save!
 
       @order.reserve_stock

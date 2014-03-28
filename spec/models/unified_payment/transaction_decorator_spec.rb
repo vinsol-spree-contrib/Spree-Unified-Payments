@@ -1,16 +1,11 @@
 require 'spec_helper'
 
 describe UnifiedPayment::Transaction do
-  
-  [:gateway_order_status, :amount, :currency, :response_status, :pan, :response_description, :order_description, :xml_response, :status].each do |attribute|
-    it { should allow_mass_assignment_of attribute }
-  end
-
   it { should belong_to(:user).class_name('Spree::User') }
   it { should belong_to(:order).class_name('Spree::Order') }
 
   it { should have_one(:store_credit).class_name('Spree::StoreCredit') }
-  let(:order) { mock_model(Spree::Order) }
+  let(:order) { Spree::Order.create! }
   let(:user) { mock_model(Spree::User) }
 
   before do

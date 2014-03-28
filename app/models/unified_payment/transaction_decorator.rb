@@ -1,6 +1,4 @@
 UnifiedPayment::Transaction.class_eval do    
-  attr_accessible :status
-
   belongs_to :order, :class_name => "Spree::Order"
   belongs_to :user, :class_name => "Spree::User"
   has_one :store_credit, :class_name => "Spree::StoreCredit"
@@ -15,7 +13,7 @@ UnifiedPayment::Transaction.class_eval do
   after_save :release_order_inventory, :if => [:expired_at?, "expired_at_was == nil"]
 
   def payment_valid_for_order?
-    !order.completed? && order.total == Float(amount)
+    !order.completed? && order.total_eql?(amount)
   end
 
   def order_inventory_released?
@@ -83,7 +81,7 @@ UnifiedPayment::Transaction.class_eval do
   end
 
   def complete_order
-    if order.total == Float(amount)
+    if order.total_eql?(amount)
       order.next!
       order.pending_payments.first.complete
     end

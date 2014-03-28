@@ -5,6 +5,10 @@ module Spree
       
       before_filter :load_transactions, :only => [:query_gateway, :receipt]
 
+      def model_class
+        UnifiedPayment::Transaction
+      end
+      
       def index
         params[:q] ||= {}
         @search = UnifiedPayment::Transaction.order('updated_at desc').ransack(params[:q])
@@ -13,8 +17,11 @@ module Spree
 
       def receipt
         @order = @card_transaction.order
-        doc = Nokogiri::XML(@card_transaction.xml_response)
-        @message = Hash.from_xml(doc.to_xml)['Message']
+        @xml_response = @card_transaction.xml_response
+        if @xml_response.include?('<Message')
+          doc = Nokogiri::XML(@card_transaction.xml_response)
+          @message = Hash.from_xml(doc.to_xml)['Message']
+        end
         render :layout => false
       end
 

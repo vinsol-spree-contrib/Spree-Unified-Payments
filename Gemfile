@@ -1,14 +1,18 @@
 source "https://rubygems.org"
-gem 'rails', '3.2.16'
+gem 'rails', '4.0.2'
 gem 'mysql2'
 gem 'sqlite3'
 
 
-gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.8'
-gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
-gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: '2-0-stable'
+gem 'spree', :git => 'https://github.com/spree/spree.git', :tag => 'v2.1.4'
 
-gem 'unified_payment', :tag => 'v1.0.1'
+# Provides basic authentication functionality for testing parts of your engine
+gem 'spree_auth_devise', github: 'spree/spree_auth_devise', :branch => '2-1-stable'
+
+gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git', tag: '2.1.0'
+
+gem 'unified_payment', github: 'vinsol/Unified-Payments', tag: '1.1.0'
+
 gem 'delayed_job_active_record', :tag => 'v4.0.0'
 
 group :test do

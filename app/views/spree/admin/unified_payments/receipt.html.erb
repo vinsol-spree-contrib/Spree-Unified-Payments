@@ -1,20 +1,24 @@
 <div class="logo-container">
     <%= image_tag(Spree::Config[:admin_interface_logo], :id => 'logo') %>
-</div>  
-<h1>Receipt:</h1>
-<table border="0" cellpadding="5" cellspacing="0">
-  <% mail_content_hash_for_unified(@message, @card_transaction).each_pair do |key, value| %>
-  <tr>
-    <td><%= key.to_s.split('_').inject([]) { |r,s| r += [s.capitalize] }.join(' ') %></td>
-    <td><%= value.to_s %></td>
-  </tr>
-  <% end %>
-  <tr>
-    <td>Order Description</td>
-    <% if @order.line_items.count == 1 %>
-      <td>Payment for <%= @order.line_items.first.product.name + " at #{Spree::Config[:site_name]}"%></td>
-    <% else %>
-      <td>Payment for <%= @order.line_items.count.to_s + " products at #{Spree::Config[:site_name]}"%></td>
+</div>
+<% if @message %>
+  <h1>Receipt:</h1>
+  <table border="0" cellpadding="5" cellspacing="0">
+    <% mail_content_hash_for_unified(@message, @card_transaction).each_pair do |key, value| %>
+    <tr>
+      <td><%= key.to_s.split('_').inject([]) { |r,s| r += [s.capitalize] }.join(' ') %></td>
+      <td><%= value.to_s %></td>
+    </tr>
     <% end %>
-  </tr>
-</table>
+    <tr>
+      <td>Order Description</td>
+      <% if @order.line_items.count == 1 %>
+        <td>Payment for <%= @order.line_items.first.product.name + " at #{Spree::Config[:site_name]}"%></td>
+      <% else %>
+        <td>Payment for <%= @order.line_items.count.to_s + " products at #{Spree::Config[:site_name]}"%></td>
+      <% end %>
+    </tr>
+  </table>
+<% else %>
+  <p>No Receipt for this transaction</p>
+<% end %>

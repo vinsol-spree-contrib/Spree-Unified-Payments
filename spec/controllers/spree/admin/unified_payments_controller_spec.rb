@@ -18,6 +18,8 @@ describe Spree::Admin::UnifiedPaymentsController do
     card_transaction.stub(:order).and_return(order)
   end
 
+  it { controller.model_class.should eq(UnifiedPayment::Transaction) }
+
   describe '#index' do
     def send_request(params = {})
       get :index, params.merge!(:use_route => 'spree', :page => 0)

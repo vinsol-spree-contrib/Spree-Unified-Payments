@@ -47,12 +47,12 @@ Spree::Order.class_eval do
 
     deliver_order_confirmation_email
 
-    self.state_changes.create({
+    self.state_changes.create(
       previous_state: previous_states.last.to_s,
       next_state:     'complete',
       name:           'order' ,
       user_id:        self.user_id
-    }, without_protection: true)
+    )
   end
 
   def reserve_stock
@@ -63,5 +63,9 @@ Spree::Order.class_eval do
         shipment.finalize!
       end
     end
+  end
+
+  def total_eql?(amount)
+    total == Float(amount)
   end
 end
