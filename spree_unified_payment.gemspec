@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform  = Gem::Platform::RUBY
   s.name      = "spree_unified_payment"
-  s.version   = "1.1.0"
+  s.version   = "1.1.1"
   s.author    = ["Manish Kangia", "Sushant Mittal"]
   s.email     = 'info@vinsol.com'
   s.homepage  = 'http://vinsol.com'
